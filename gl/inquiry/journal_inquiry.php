@@ -83,8 +83,8 @@ $editors = array(
 	ST_JOURNAL => "/gl/gl_journal.php?ModifyGL=Yes&trans_no=%d&trans_type=%d",
 	ST_BANKPAYMENT => "/gl/gl_bank.php?ModifyPayment=Yes&trans_no=%d&trans_type=%d",
 	ST_BANKDEPOSIT => "/gl/gl_bank.php?ModifyDeposit=Yes&trans_no=%d&trans_type=%d",
-//	4=> Funds Transfer,
-   ST_SALESINVOICE => "/sales/customer_invoice.php?ModifyInvoice=%d",
+	ST_BANKTRANSFER => "/gl/bank_transfer.php?ModifyTransfer=Yes&trans_no=%d&trans_type=%d",
+	ST_SALESINVOICE => "/sales/customer_invoice.php?ModifyInvoice=%d",
 //   11=>
 // free hand (debtors_trans.order_==0)
 //	"/sales/credit_note_entry.php?ModifyCredit=%d"

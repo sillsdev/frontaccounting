@@ -1,12 +1,12 @@
 <?php
 /**********************************************************************
     Copyright (C) FrontAccounting, LLC.
-	Released under the terms of the GNU General Public License, GPL, 
-	as published by the Free Software Foundation, either version 3 
+	Released under the terms of the GNU General Public License, GPL,
+	as published by the Free Software Foundation, either version 3
 	of the License, or (at your option) any later version.
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
     See the License here <http://www.gnu.org/licenses/gpl-3.0.html>.
 ***********************************************************************/
 //----------------------------------------------------------------------------------
@@ -32,7 +32,7 @@ function add_bank_trans($type, $trans_no, $bank_act, $ref, $date_,
 	}
 	else
 		$amount_bank = $amount;
-	$amount_bank = round2($amount_bank, user_price_dec());	
+	$amount_bank = round2($amount_bank, user_price_dec());
 
 	// Also store the rate to the home
 	//$BankToHomeCurrencyRate = get_exchange_rate_to_home_currency($bank_account_currency, $date_);
@@ -102,6 +102,7 @@ function get_bank_trans_for_bank_account($bank_account, $from, $to)
 		AND ISNULL(v.date_)
 		AND trans_date >= '$from'
 		AND trans_date <= '$to'
+		AND amount > 0
 		ORDER BY trans_date, t.id";
 
 	return db_query($sql,"The transactions for '" . $bank_account . "' could not be retrieved");
@@ -163,10 +164,14 @@ function void_bank_trans($type, $type_no, $nested=false)
 }
 
 /**
-*	Check account history to find transaction which would exceed authorized overdraft for given account.
-*	Returns null or transaction in conflict. Running balance is checked on daily basis only, to enable ID change after edition.
-*	$delta_amount - tested change in bank balance at $date.
-**/
+ *	Check account history to find transaction which would exceed authorized overdraft for given account.
+ *	Returns null or transaction in conflict. Running balance is checked on daily basis only, to enable ID change after edition.
+ * @param double $delta_amount tested change in bank balance at $date
+ * @param int $bank_account
+ * @param string $date
+ * @param string $user
+ * @return NULL|multitype:number string |multitype:
+ */
 function check_bank_account_history($delta_amount, $bank_account, $date=null, $user=null)
 {
 	if ($delta_amount >= 0 && isset($date))
