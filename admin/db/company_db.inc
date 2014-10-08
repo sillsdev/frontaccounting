@@ -1,12 +1,12 @@
 <?php
 /**********************************************************************
     Copyright (C) FrontAccounting, LLC.
-	Released under the terms of the GNU General Public License, GPL, 
-	as published by the Free Software Foundation, either version 3 
+	Released under the terms of the GNU General Public License, GPL,
+	as published by the Free Software Foundation, either version 3
 	of the License, or (at your option) any later version.
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
     See the License here <http://www.gnu.org/licenses/gpl-3.0.html>.
 ***********************************************************************/
 /*
@@ -28,16 +28,16 @@ function update_company_prefs( $params, $pref = TB_PREF )
 	Get company preferences. Returns cached values from global variable SysPrefs
 	or retrieved from database if SysPrefs values are not set.
 	$prefs can be preference name, array of names, or null for all preferences.
-	
+
 */
 function get_company_pref($prefs = null, $tbpref = null)
 {
 	global $SysPrefs, $db_version;
-	
+
 	static $cached; // retrieve values from db once a request. Some values can't be cached between requests
 					// to ensure prefs integrity for all usrs (e.g. gl_close_date).
-	
- 	if (!$cached || !isset($_SESSION['SysPrefs'])) { // cached preferences
+
+	if (!isset($_SESSION['SysPrefs'])) { // cached preferences
 
 		$_SESSION['SysPrefs'] = new sys_prefs();
 
@@ -58,11 +58,9 @@ function get_company_pref($prefs = null, $tbpref = null)
 
 		// update current db status for info in log file
 		$SysPrefs->db_ok = $SysPrefs->prefs['version_id'] == $db_version;
-		$cached = true;
 	}
 
 	$all = $_SESSION['SysPrefs']->prefs;
-
 	if (!$prefs)
 		return $all;
 	elseif (is_string($prefs))
@@ -72,7 +70,7 @@ function get_company_pref($prefs = null, $tbpref = null)
 	foreach($prefs as $name)
 		$ret[$name] = $all[$name];
 
-		return $ret;
+	return $ret;
 }
 
 function get_company_prefs($tbpref = TB_PREF)
@@ -112,14 +110,14 @@ function get_company_extensions($id = -1) {
 
 function add_payment_terms($daysOrFoll, $terms, $dayNumber)
 {
-	if ($daysOrFoll) 
+	if ($daysOrFoll)
 	{
 		$sql = "INSERT INTO ".TB_PREF."payment_terms (terms,
 			days_before_due, day_in_following_month)
 			VALUES (" .
 			db_escape($terms) . ", " . db_escape($dayNumber) . ", 0)";
-	} 
-	else 
+	}
+	else
 	{
 		$sql = "INSERT INTO ".TB_PREF."payment_terms (terms,
 			days_before_due, day_in_following_month)
@@ -131,14 +129,14 @@ function add_payment_terms($daysOrFoll, $terms, $dayNumber)
 
 function update_payment_terms($selected_id, $daysOrFoll, $terms, $dayNumber)
 {
-	if ($daysOrFoll) 
+	if ($daysOrFoll)
 	{
 		$sql = "UPDATE ".TB_PREF."payment_terms SET terms=" . db_escape($terms) . ",
 			day_in_following_month=0,
 			days_before_due=" . db_escape($dayNumber) . "
 			WHERE terms_indicator = " .db_escape($selected_id);
-	} 
-	else 
+	}
+	else
 	{
 		$sql = "UPDATE ".TB_PREF."payment_terms SET terms=" . db_escape($terms) . ",
 			day_in_following_month=" . db_escape($dayNumber) . ",
