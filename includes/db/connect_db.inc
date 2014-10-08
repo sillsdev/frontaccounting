@@ -1,12 +1,12 @@
 <?php
 /**********************************************************************
     Copyright (C) FrontAccounting, LLC.
-	Released under the terms of the GNU General Public License, GPL, 
-	as published by the Free Software Foundation, either version 3 
+	Released under the terms of the GNU General Public License, GPL,
+	as published by the Free Software Foundation, either version 3
 	of the License, or (at your option) any later version.
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
     See the License here <http://www.gnu.org/licenses/gpl-3.0.html>.
 ***********************************************************************/
 
@@ -17,14 +17,14 @@ function set_global_connection($company=-1)
 	cancel_transaction(); // cancel all aborted transactions if any
 	$transaction_level = 0;
 
-	if ($company == -1) 
+	if ($company == -1)
 		$company = $_SESSION["wa_current_user"]->company;
 
 	$_SESSION["wa_current_user"]->cur_con = $company;
 
 	$connection = $db_connections[$company];
 
-	$db = mysql_connect($connection["host"], $connection["dbuser"], $connection["dbpassword"]);
+	$db = @mysql_connect($connection["host"], $connection["dbuser"], $connection["dbpassword"]);
 		mysql_select_db($connection["dbname"], $db);
 	///// From MySql release 5.6.6 the sql_mode is no longer empty as it was prior to
 	///// this release. Just for safety we set it empty for all 5.6 release and higher.
@@ -32,7 +32,7 @@ function set_global_connection($company=-1)
 	///// our sessions.
 	///// We are, however, investigating the existing code to be compatible in the future.
 	///// We are also working on a mysql/mysqli solution to go to release 2.4.
-	if (strncmp(mysql_get_server_info(), "5.6", 3) >= 0) 
+	if (strncmp(mysql_get_server_info(), "5.6", 3) >= 0)
 		db_query("SET sql_mode = ''");
 	/////
 	return $db;
@@ -46,7 +46,7 @@ function db_query($sql, $err_msg=null)
 {
 	global $db, $show_sql, $sql_trail, $select_trail, $go_debug, $sql_queries, $Ajax,
 		$db_connections, $db_last_inserted_id;
-	
+
 	// set current db prefix
 	$cur_prefix = $db_connections[$_SESSION["wa_current_user"]->cur_con]['tbpref'];
 	$sql = str_replace(TB_PREF, $cur_prefix, $sql);
@@ -58,7 +58,7 @@ function db_query($sql, $err_msg=null)
 	}
 
 	$result = mysql_query($sql, $db);
-	
+
 	if($sql_trail) {
 		$db_last_inserted_id = mysql_insert_id($db);	// preserve in case trail insert is done
 		if ($select_trail || (strstr($sql, 'SELECT') === false)) {
@@ -218,7 +218,7 @@ function db_drop_db($connection)
 function db_close($dbase = null)
 {
 	global $db;
-	
+
 	if (!$dbase)
 		$dbase = $db;
 	return mysql_close($dbase);
