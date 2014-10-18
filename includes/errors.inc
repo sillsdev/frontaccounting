@@ -1,12 +1,12 @@
 <?php
 /**********************************************************************
     Copyright (C) FrontAccounting, LLC.
-	Released under the terms of the GNU General Public License, GPL, 
-	as published by the Free Software Foundation, either version 3 
+	Released under the terms of the GNU General Public License, GPL,
+	as published by the Free Software Foundation, either version 3
 	of the License, or (at your option) any later version.
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
     See the License here <http://www.gnu.org/licenses/gpl-3.0.html>.
 ***********************************************************************/
 $messages = array(); // container for system messages
@@ -31,7 +31,7 @@ function get_backtrace($html = false, $skip=0)
 			}
 		}
 		$str .= $tr['function'].'(';
-		
+
 		if(is_array($tr['args'])) {
 			$args = array();
 			foreach($tr['args'] as $n=>$a) {
@@ -75,29 +75,36 @@ function error_handler($errno, $errstr, $file, $line) {
 		$bt = get_backtrace(true, 1);
 	}
 
-	// error_reporting==0 when messages are set off with @ 
+	$logged = false;
+	if($go_debug > 0) { // log all messages
+		$logged = true;
+		$user = @$_SESSION["wa_current_user"]->loginname;
+		$context = isset($SysPrefs) && !$SysPrefs->db_ok ? '[before upgrade]' : '';
+		error_log(user_company() . ":$user:". basename($file) .":$line:$context $errstr");
+	}
+	// error_reporting==0 when messages are set off with @
 	if ($errno & error_reporting()) {
 		// suppress duplicated errors
 		if (!in_array(array($errno, $errstr, $file, $line, @$bt), $messages))
 			$messages[] = array($errno, $errstr, $file, $line, @$bt);
 	}
-	else if($errno&~E_NOTICE) { // log all not displayed messages 
+	else if(!$logged && $errno & ~E_NOTICE) { // log all not displayed messages
 		$user = @$_SESSION["wa_current_user"]->loginname;
 		$context = isset($SysPrefs) && !$SysPrefs->db_ok ? '[before upgrade]' : '';
 		error_log(user_company() . ":$user:". basename($file) .":$line:$context $errstr");
 	}
-	
-    return true;
+
+	return true;
 }
 //------------------------------------------------------------------------------
 //	Formats system messages before insert them into message <div>
 // FIX center is unused now
 function fmt_errors($center=false) {
     global $messages, $path_to_root, $go_debug;
-  
+
   $msg_class = array(
   	E_USER_ERROR => 'err_msg',
-  	E_USER_WARNING =>'warn_msg', 
+  	E_USER_WARNING =>'warn_msg',
 	E_USER_NOTICE => 'note_msg');
 
   $type = E_USER_NOTICE;
@@ -110,17 +117,17 @@ function fmt_errors($center=false) {
 
 		if ($msg[0]>$type) continue;
 
-		if ($msg[0]<$type) { 
+		if ($msg[0]<$type) {
 			if ($msg[0] == E_USER_WARNING) {
-				$type = E_USER_WARNING; // user warnings 
+				$type = E_USER_WARNING; // user warnings
 				$content = ''; 			// clean notices when we have errors
 			} else  {
-				$type = E_USER_ERROR; 	// php or user errors 
+				$type = E_USER_ERROR; 	// php or user errors
 				if($type == E_USER_WARNING)
 					$content = ''; 			// clean other messages
 			}
 		}
-		
+
 	    $str = $msg[1];
 		if (!in_array($msg[0], array(E_USER_NOTICE, E_USER_ERROR, E_USER_WARNING)) && $msg[2] != null)
 		  $str .= ' '._('in file').': '.$msg[2].' '._('at line ').$msg[3];
@@ -141,11 +148,11 @@ function fmt_errors($center=false) {
 //
 function error_box() {
     global $before_box;
-    
+
     echo "<div id='msgbox'>";
 
 // Necessary restart instead of get_contents/clean calls due to a bug in php 4.3.2
-	$before_box = ob_get_clean(); // save html content before error box 
+	$before_box = ob_get_clean(); // save html content before error box
     ob_start('output_html');
     echo "</div>";
 }
@@ -158,8 +165,8 @@ function end_flush() {
 	if (isset($Ajax))
 		$Ajax->run();
 
- 	 // on some (but not all) php versions zlib extension adds 1 additional level of buffering, 
- 	 // so flush the last buffer outside the loop to be on safe side 
+ 	 // on some (but not all) php versions zlib extension adds 1 additional level of buffering,
+ 	 // so flush the last buffer outside the loop to be on safe side
  	while(ob_get_level() > 1)
  		ob_end_flush();
 	@ob_end_flush();
@@ -174,27 +181,27 @@ function display_db_error($msg, $sql_statement=null, $exit=true)
 
 	$warning = $msg==null;
 	$db_error = db_error_no();
-	
+
 //	$str = "<span class='errortext'><b>" . _("DATABASE ERROR :") . "</b> $msg</span><br>";
 	if($warning)
 		$str = "<b>" . _("Debug mode database warning:") . "</b><br>";
 	else
 		$str = "<b>" . _("DATABASE ERROR :") . "</b> $msg<br>";
-	
-	if ($db_error != 0) 
+
+	if ($db_error != 0)
 	{
 		$str .= "error code : " . $db_error . "<br>";
 		$str .= "error message : " . db_error_msg($db) . "<br>";
 	}
-	
-	if ($debug == 1) 
+
+	if ($debug == 1)
 	{
 		$cur_prefix = $db_connections[$_SESSION["wa_current_user"]->cur_con]['tbpref'];
 
 		$str .= "sql that failed was : ".str_replace(TB_PREF, $cur_prefix, $sql_statement)."<br>";
 //		if ($go_debug > 1) display_backtrace();
 	}
-	
+
 	$str .= "<br><br>";
 	if ($go_debug)
 		error_log($str);
@@ -211,13 +218,13 @@ function display_db_error($msg, $sql_statement=null, $exit=true)
 function frindly_db_error($db_error)
 {
 	global $db_duplicate_error_code;
-	
-	if ($db_error == $db_duplicate_error_code) 
-	{	
+
+	if ($db_error == $db_duplicate_error_code)
+	{
 		display_error(_("The entered information is a duplicate. Please go back and enter different values."));
 		return true;
 	}
-	
+
 	return false;
 }
 
@@ -225,25 +232,25 @@ function check_db_error($msg, $sql_statement, $exit_if_error=true, $rollback_if_
 {
 	global $db, $go_debug;
 	$db_error = db_error_no();
-	
-	if ($db_error != 0) 
+
+	if ($db_error != 0)
 	{
-		
+
 		if ($go_debug || !frindly_db_error($db_error)) {
 				display_db_error($msg, $sql_statement, false);
 		}
-		
-		if ($rollback_if_error) 
+
+		if ($rollback_if_error)
 		{
 		  $rollback_result = db_query("rollback");
 		}
-		
-		if ($exit_if_error) 
+
+		if ($exit_if_error)
 		{
 			end_page(); exit;
 		}
 	}
-	return $db_error;		
+	return $db_error;
 }
 
 ?>
