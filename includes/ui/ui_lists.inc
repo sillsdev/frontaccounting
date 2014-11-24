@@ -203,7 +203,7 @@ function stock_items_list_cells($label, $name, $selected_id = null, $all_option 
 //
 function sales_items_list($name, $selected_id = null, $all_option = false, $submit_on_change = false, $type = '', $opts = array())
 {
-	return ListRenderer::get()->sales_item_list($name, $selected_id, $all_option, $submit_on_change, $type, $opts);
+	return ListRenderer::get()->sales_items_list($name, $selected_id, $all_option, $submit_on_change, $type, $opts);
 }
 
 function sales_items_list_cells($label, $name, $selected_id = null, $all_option = false, $submit_on_change = false, $editkey = false)
