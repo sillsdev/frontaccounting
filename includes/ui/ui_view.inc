@@ -1,12 +1,12 @@
 <?php
 /**********************************************************************
     Copyright (C) FrontAccounting, LLC.
-	Released under the terms of the GNU General Public License, GPL, 
-	as published by the Free Software Foundation, either version 3 
+	Released under the terms of the GNU General Public License, GPL,
+	as published by the Free Software Foundation, either version 3
 	of the License, or (at your option) any later version.
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
     See the License here <http://www.gnu.org/licenses/gpl-3.0.html>.
 ***********************************************************************/
 include_once($path_to_root . "/admin/db/voiding_db.inc");
@@ -14,7 +14,7 @@ include_once($path_to_root . "/includes/types.inc");
 
 //--------------------------------------------------------------------------------------
 
-function get_supplier_trans_view_str($type, $trans_no, $label="", $icon=false, 
+function get_supplier_trans_view_str($type, $trans_no, $label="", $icon=false,
 	$class='', $id='')
 {
 	$viewer = "purchasing/view/";
@@ -50,10 +50,10 @@ function get_gl_view_str($type, $trans_no, $label="", $force=false, $class='', $
 	{
 		$label = _("GL");
 		$icon = ICON_GL;
-	}	
+	}
 
-	return viewer_link($label, 
-		"gl/view/gl_trans_view.php?type_id=$type&trans_no=$trans_no", 
+	return viewer_link($label,
+		"gl/view/gl_trans_view.php?type_id=$type&trans_no=$trans_no",
 		$class, $id, $icon);
 }
 
@@ -68,7 +68,7 @@ function get_gl_view_str_cell($type, $trans_no, $label="")
 
 //--------------------------------------------------------------------------------------
 
-function get_customer_trans_view_str($type, $trans_no, $label="", $icon=false, 
+function get_customer_trans_view_str($type, $trans_no, $label="", $icon=false,
 	$class='', $id='')
 {
 	$viewer = "sales/view/";
@@ -96,7 +96,7 @@ function get_customer_trans_view_str($type, $trans_no, $label="", $icon=false,
 		$lbl = $trans;
 	if($preview_str!='') $preview_str .= ',';
 
-	$preview_str .= viewer_link($lbl, $viewer."?trans_no=$trans&trans_type=$type", 
+	$preview_str .= viewer_link($lbl, $viewer."?trans_no=$trans&trans_type=$type",
 		$class, $id, $icon);
 
   }
@@ -105,7 +105,7 @@ function get_customer_trans_view_str($type, $trans_no, $label="", $icon=false,
 
 //--------------------------------------------------------------------------------------
 
-function get_banking_trans_view_str($type, $trans_no, $label="", 
+function get_banking_trans_view_str($type, $trans_no, $label="",
 	$icon=false, $class='', $id='')
 {
 	if ($label == "")
@@ -120,13 +120,13 @@ function get_banking_trans_view_str($type, $trans_no, $label="",
 	else
 		return null;
 
-	return viewer_link($label, "gl/view/$viewer?trans_no=$trans_no", 
+	return viewer_link($label, "gl/view/$viewer?trans_no=$trans_no",
 		$class, $id,  $icon);
 }
 
 //--------------------------------------------------------------------------------------
 
-function get_inventory_trans_view_str($type, $trans_no, $label="", 
+function get_inventory_trans_view_str($type, $trans_no, $label="",
 	$icon=false, $class='', $id='')
 {
 	$viewer = "inventory/view/";
@@ -147,7 +147,7 @@ function get_inventory_trans_view_str($type, $trans_no, $label="",
 
 //--------------------------------------------------------------------------------------
 
-function get_manufacturing_trans_view_str($type, $trans_no, $label="", 
+function get_manufacturing_trans_view_str($type, $trans_no, $label="",
 	$icon=false, $class='', $id='')
 {
 	$viewer = "manufacturing/view/";
@@ -171,7 +171,7 @@ function get_manufacturing_trans_view_str($type, $trans_no, $label="",
 
 //--------------------------------------------------------------------------------------
 
-function get_dimensions_trans_view_str($type, $trans_no, $label="", $icon=false, 
+function get_dimensions_trans_view_str($type, $trans_no, $label="", $icon=false,
 	$class='', $id='')
 {
 	if ($type == ST_DIMENSION)
@@ -187,7 +187,7 @@ function get_dimensions_trans_view_str($type, $trans_no, $label="", $icon=false,
 /*
 	Journal entry or cost update postings link
 */
-function get_journal_trans_view_str($type, $trans_no, $label="", $icon=false, 
+function get_journal_trans_view_str($type, $trans_no, $label="", $icon=false,
 	$class='', $id='')
 {
 	if ($type == ST_JOURNAL || $type == ST_COSTUPDATE)
@@ -216,7 +216,7 @@ function get_package_view_str($pkg, $label="", $icon=false, $class='', $id='')
 
 //--------------------------------------------------------------------------------------
 
-function get_trans_view_str($type, $trans_no, $label="", $icon=false, 
+function get_trans_view_str($type, $trans_no, $label="", $icon=false,
 	$class='', $id='')
 {
 	$view_str = get_customer_trans_view_str($type, $trans_no, $label, $icon, $class, $id);
@@ -267,7 +267,7 @@ function check_ui_refresh($name=null)
 
 //--------------------------------------------------------------------------------------
 // Displays currency exchange rate for given date.
-// When there is no exrate for today, 
+// When there is no exrate for today,
 // gets it form ECB and stores in local database.
 //
 function exchange_rate_display($from_currency, $to_currency, $date_, $force_edit=false)
@@ -289,7 +289,7 @@ function exchange_rate_display($from_currency, $to_currency, $date_, $force_edit
 			$rate = get_date_exchange_rate($currency, $date_); // try local
 
 			if ($rate)
-				$readonly = true; // if we have already local exrate keep it unchanged 
+				$readonly = true; // if we have already local exrate keep it unchanged
 
 			if (!$rate) {	// retry from remote service
 				$row = get_currency($currency);
@@ -397,9 +397,8 @@ function view_stock_status($stock_id, $description=null, $echo=true)
 
 function view_stock_status_cell($stock_id, $description=null)
 {
-	echo "<td>";
-	view_stock_status($stock_id, $description);
-	echo "</td>";
+	$control = view_stock_status($stock_id, $description, false);
+	label_cell($control);
 }
 
 //--------------------------------------------------------------------------------------
@@ -448,7 +447,7 @@ function display_customer_trans_tax_details($tax_items, $columns)
         	else
         		label_row(_("Included") . " " . $tax_type_name
         			. ": $tax", "", "colspan=$columns align=right", "align=right");
-        }			
+        }
     	else
         	label_row($tax_type_name, $tax, "colspan=$columns align=right", "align=right");
     }
@@ -623,7 +622,7 @@ function display_allocations_to($person_type, $person_id, $type, $type_no, $tota
 function display_quick_entries(&$cart, $id, $base, $type, $descr='')
 {
 	$bank_amount = 0;
-	
+
 	if (!isset($id) || $id == null || $id == "")
 	{
 		display_error( _("No Quick Entries are defined."));
@@ -646,9 +645,9 @@ function display_quick_entries(&$cart, $id, $base, $type, $descr='')
 					$begin = "";
 				else
 					$begin = begin_fiscalyear(); // from fiscalyear begin
-			}		
+			}
 			$base = get_gl_trans_from_to($begin, $cart->tran_date, $qe['base_desc']);
-				
+
 		}
 		if ($descr != '') $qe['description'] .= ': '.$descr;
 		$result = get_quick_entry_lines($id);
@@ -657,7 +656,7 @@ function display_quick_entries(&$cart, $id, $base, $type, $descr='')
 			display_error( _("No Quick Entry lines are defined."));
 			set_focus('totamount');
 			return 0;
-		}	
+		}
 		$totrate = 0;
 		while ($row = db_fetch($result))
 		{
@@ -667,7 +666,7 @@ function display_quick_entries(&$cart, $id, $base, $type, $descr='')
 				case "t": // post taxes calculated on base amount
 				case "t+": // ditto & increase base amount
 				case "t-": // ditto & reduce base amount
-					if (substr($row['action'],0,1) != 'T') 
+					if (substr($row['action'],0,1) != 'T')
 						$totrate += get_tax_type_default_rate($row['dest_id']);
 			}
 		}
@@ -708,7 +707,7 @@ function display_quick_entries(&$cart, $id, $base, $type, $descr='')
 						$first = false;
 					}
 
-					if (substr($qe_line['action'],0,1) != 'T') 
+					if (substr($qe_line['action'],0,1) != 'T')
 						$part = $taxbase;
 					else
 						$part = $base/100;
@@ -726,21 +725,21 @@ function display_quick_entries(&$cart, $id, $base, $type, $descr='')
 					}
 					$tax = round2($part * $item_tax['rate'],  user_price_dec());
 					if ($tax==0) continue 2;
-					$gl_code = ($type == QE_DEPOSIT || ($type == QE_JOURNAL && $base < 0)) 
+					$gl_code = ($type == QE_DEPOSIT || ($type == QE_JOURNAL && $base < 0))
 						? $item_tax['sales_gl_code'] : $item_tax['purchasing_gl_code'];
 					if (!is_tax_gl_unique($gl_code)) {
 	   					display_error(_("Cannot post to GL account used by more than one tax type."));
 						break 2;
 					}
 					if ($type != QE_SUPPINV)
-						$cart->add_gl_item($gl_code, 
-							$qe_line['dimension_id'], $qe_line['dimension2_id'], 
+						$cart->add_gl_item($gl_code,
+							$qe_line['dimension_id'], $qe_line['dimension2_id'],
 							$tax, $qe['description']);
-					else 
+					else
 					{
 						$acc_name = get_gl_account_name($gl_code);
-						$cart->add_gl_codes_to_trans($gl_code, 
-							$acc_name, $qe_line['dimension_id'], 
+						$cart->add_gl_codes_to_trans($gl_code,
+							$acc_name, $qe_line['dimension_id'],
 							$qe_line['dimension2_id'], $tax, $qe['description']);
 					}
 					if (strpos($qe_line['action'], '+'))
@@ -752,15 +751,15 @@ function display_quick_entries(&$cart, $id, $base, $type, $descr='')
 			if ($type != QE_SUPPINV)
 				$cart->add_gl_item($qe_line['dest_id'], $qe_line['dimension_id'],
 					$qe_line['dimension2_id'], $part, $qe['description']);
-			else 
+			else
 			{
 				$acc_name = get_gl_account_name($qe_line['dest_id']);
-				$cart->add_gl_codes_to_trans($qe_line['dest_id'], 
-					$acc_name, $qe_line['dimension_id'], 
+				$cart->add_gl_codes_to_trans($qe_line['dest_id'],
+					$acc_name, $qe_line['dimension_id'],
 					$qe_line['dimension2_id'], $part, $qe['description']);
 			}
 		}
-	}	
+	}
 	return $bank_amount;
 }
 
@@ -768,61 +767,61 @@ function display_quick_entries(&$cart, $id, $base, $type, $descr='')
 //
 //	Simple English version of number to words conversion.
 //
-function _number_to_words($number) 
-{ 
-    $Bn = floor($number / 1000000000); /* Billions (giga) */ 
-    $number -= $Bn * 1000000000; 
-    $Gn = floor($number / 1000000);  /* Millions (mega) */ 
-    $number -= $Gn * 1000000; 
-    $kn = floor($number / 1000);     /* Thousands (kilo) */ 
-    $number -= $kn * 1000; 
-    $Hn = floor($number / 100);      /* Hundreds (hecto) */ 
-    $number -= $Hn * 100; 
-    $Dn = floor($number / 10);       /* Tens (deca) */ 
+function _number_to_words($number)
+{
+    $Bn = floor($number / 1000000000); /* Billions (giga) */
+    $number -= $Bn * 1000000000;
+    $Gn = floor($number / 1000000);  /* Millions (mega) */
+    $number -= $Gn * 1000000;
+    $kn = floor($number / 1000);     /* Thousands (kilo) */
+    $number -= $kn * 1000;
+    $Hn = floor($number / 100);      /* Hundreds (hecto) */
+    $number -= $Hn * 100;
+    $Dn = floor($number / 10);       /* Tens (deca) */
     $n = $number % 10;               /* Ones */
 
-    $res = ""; 
+    $res = "";
 
-    if ($Bn) 
-        $res .= _number_to_words($Bn) . " Billion"; 
-    if ($Gn) 
-        $res .= (empty($res) ? "" : " ") . _number_to_words($Gn) . " Million"; 
-    if ($kn) 
-        $res .= (empty($res) ? "" : " ") . _number_to_words($kn) . " Thousand"; 
-    if ($Hn) 
-        $res .= (empty($res) ? "" : " ") . _number_to_words($Hn) . " Hundred"; 
+    if ($Bn)
+        $res .= _number_to_words($Bn) . " Billion";
+    if ($Gn)
+        $res .= (empty($res) ? "" : " ") . _number_to_words($Gn) . " Million";
+    if ($kn)
+        $res .= (empty($res) ? "" : " ") . _number_to_words($kn) . " Thousand";
+    if ($Hn)
+        $res .= (empty($res) ? "" : " ") . _number_to_words($Hn) . " Hundred";
 
-    $ones = array("", "One", "Two", "Three", "Four", "Five", "Six", 
-        "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen", 
-        "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", 
-        "Nineteen"); 
-    $tens = array("", "", "Twenty", "Thirty", "Fourty", "Fifty", "Sixty", 
-        "Seventy", "Eighty", "Ninety"); 
+    $ones = array("", "One", "Two", "Three", "Four", "Five", "Six",
+        "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen",
+        "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen",
+        "Nineteen");
+    $tens = array("", "", "Twenty", "Thirty", "Fourty", "Fifty", "Sixty",
+        "Seventy", "Eighty", "Ninety");
 
-    if ($Dn || $n) 
-    { 
-        if (!empty($res)) 
-            $res .= " and "; 
-        if ($Dn < 2) 
-            $res .= $ones[$Dn * 10 + $n]; 
-        else 
-        { 
-            $res .= $tens[$Dn]; 
-            if ($n) 
-                $res .= "-" . $ones[$n]; 
-        } 
-    } 
+    if ($Dn || $n)
+    {
+        if (!empty($res))
+            $res .= " and ";
+        if ($Dn < 2)
+            $res .= $ones[$Dn * 10 + $n];
+        else
+        {
+            $res .= $tens[$Dn];
+            if ($n)
+                $res .= "-" . $ones[$n];
+        }
+    }
 
-    if (empty($res)) 
-        $res = "zero"; 
-    return $res; 
-} 
+    if (empty($res))
+        $res = "zero";
+    return $res;
+}
 
 function price_in_words($amount, $document=0)
 {
 	// use local price_in_words() if the hook is defined
 	$price = hook_price_in_words($amount, $document);
-	if ($price) 
+	if ($price)
 		return $price;
 
 	// Only usefor Remittance and Receipts as default
@@ -842,7 +841,7 @@ function price_in_words($amount, $document=0)
     else
     	$frac = "";
     return _number_to_words(intval($amount)) . $frac;
-}    
+}
 
 function get_js_open_window($width, $height)
 {
@@ -867,10 +866,10 @@ function set_focus($name, $form_no=0) {
 //
 //	Set default focus on first field $name if not set yet
 //	Returns unique name if $name=null
-//	
+//
 function default_focus($name=null, $form_no=0) {
-	static $next; 
-	if ($name==null) 
+	static $next;
+	if ($name==null)
 		$name = uniqid('_el',true);
     if (!isset($_POST['_focus'])) {
 	  set_focus($name);
@@ -1394,7 +1393,7 @@ function _vl($mixed, $title = '', $exit = false)
 
 function display_backtrace($cond=true, $msg='') {
 	if ($cond) {
-		if ($msg) 
+		if ($msg)
 			$str = "<center><span class='headingtext'>$msg</span></center>\n";
 		else
 			$str = '';
