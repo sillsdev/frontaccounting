@@ -342,6 +342,20 @@ class ControlRenderer
 		echo "</tr>\n";
 	}
 
+	/**
+	 * @param array | string $cells
+	 */
+	function table_add_cells($cells)
+	{
+		if (is_array($cells)) {
+			foreach ($cells as $cell) {
+				echo $cell;
+			}
+		} else {
+			echo $cells;
+		}
+	}
+
 	function br($num = 1)
 	{
 		for ($i = 0; $i < $num; $i ++)

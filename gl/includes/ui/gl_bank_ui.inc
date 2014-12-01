@@ -1,12 +1,12 @@
 <?php
 /**********************************************************************
     Copyright (C) FrontAccounting, LLC.
-	Released under the terms of the GNU General Public License, GPL, 
-	as published by the Free Software Foundation, either version 3 
+	Released under the terms of the GNU General Public License, GPL,
+	as published by the Free Software Foundation, either version 3
 	of the License, or (at your option) any later version.
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
     See the License here <http://www.gnu.org/licenses/gpl-3.0.html>.
 ***********************************************************************/
 function display_bank_header(&$order)
@@ -20,7 +20,7 @@ function display_bank_header(&$order)
 	start_outer_table(TABLESTYLE2, "width=90%"); // outer table
 
 	table_section(1);
-	
+
     date_row(_("Date:"), 'date_', '', true, 0, 0, 0, null, true);
 
 	ref_row(_("Reference:"), 'ref', '');
@@ -68,7 +68,7 @@ function display_bank_header(&$order)
 
         	if (db_customer_has_branches($_POST['person_id']))
         	{
-        		customer_branches_list_row(_("Branch:"), $_POST['person_id'], 
+        		customer_branches_list_row(_("Branch:"), $_POST['person_id'],
 					'PersonDetailID', null, false, true, true, true);
         	}
         	else
@@ -84,9 +84,9 @@ function display_bank_header(&$order)
         			$customer_error = true;
 					display_error(_("This customer account is on hold."));
         		}
-        		else			
+        		else
 					display_warning(_("This customer account is on hold."));
-        	}		
+        	}
     		break;
 
 		case PT_QUICKENTRY :
@@ -99,7 +99,7 @@ function display_bank_header(&$order)
 			}
 			amount_row($qid['base_desc'].":", 'totamount', price_format($qid['base_amount']),
 				 null, "&nbsp;&nbsp;".submit('go', _("Go"), false, false, true));
-			break;	
+			break;
 		//case payment_person_types::Project() :
     	//	dimensions_list_row(_("Dimension:"), 'person_id', $_POST['person_id'], false, null, true);
     	//	break;
@@ -111,12 +111,12 @@ function display_bank_header(&$order)
 	{
 		if ($_POST['PayType'] == PT_CUSTOMER)
 			$_POST['bank_account'] = get_default_customer_bank_account($_POST['person_id']);
-		elseif ($_POST['PayType'] == PT_SUPPLIER)	
+		elseif ($_POST['PayType'] == PT_SUPPLIER)
 			$_POST['bank_account'] = get_default_supplier_bank_account($_POST['person_id']);
 		else
 			unset($_POST['bank_account']);
-	}		
-    
+	}
+
     bank_accounts_list_row( $payment ? _("From:") : _("Into:"), 'bank_account', null, true);
     if ($payment)
 		bank_balance_row($_POST['bank_account']);
@@ -179,7 +179,7 @@ function display_gl_items($title, &$order)
 			//amount_cell(abs($item->amount));
 			if ($order->trans_type == ST_BANKDEPOSIT)
 				amount_cell(-$item->amount);
-			else		
+			else
 				amount_cell($item->amount);
 			label_cell($item->reference);
 
@@ -258,7 +258,7 @@ function gl_edit_item_controls(&$order, $dim, $Index=null)
 			$_POST['code_id'] =
 				get_company_pref($payment ? 'default_cogs_act':'default_inv_sales_act');
 		}
-		echo gl_all_accounts_list('code_id', null, true, true);
+		ControlRenderer::get()->table_add_cells(gl_all_accounts_list('code_id', null, true, true));
 		if ($dim >= 1)
 			dimensions_list_cells(null, 'dimension_id', null, true, " ", false, 1);
 		if ($dim > 1)
@@ -299,7 +299,7 @@ function gl_options_controls($order)
 
 	$type = get_post('PayType');
 	$bank_curr = get_bank_account_currency(get_post('bank_account'));
-	$person_curr = $type == PT_CUSTOMER ? get_customer_currency(get_post('person_id')) 
+	$person_curr = $type == PT_CUSTOMER ? get_customer_currency(get_post('person_id'))
 		: ($type == PT_SUPPLIER ? get_supplier_currency(get_post('person_id')) : $bank_curr);
 
 	if ($person_curr != $bank_curr)
