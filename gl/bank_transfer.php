@@ -152,7 +152,7 @@ function gl_payment_controls($trans_no)
 
 function check_valid_entries($trans_no)
 {
-	global $Refs;
+	global $Refs, $systypes_array;
 
 	if (!is_date($_POST['DatePaid']))
 	{
@@ -183,27 +183,40 @@ function check_valid_entries($trans_no)
 
 	$amnt_tr = input_num('charge') + input_num('amount');
 
-	if ($limit !== null && floatcmp($limit, $amnt_tr) < 0)
-	{
-		display_error(sprintf(_("The total bank amount exceeds allowed limit (%s) for source account."), price_format($limit)));
-		set_focus('amount');
-		return false;
-	}
 	if ($trans_no) {
 		if (null != ($problemTransaction = check_bank_transfer(
-			$trans_no, $_POST['FromBankAccount'], $_POST['ToBankAccount'], $_POST['DatePaid'], -$amnt_tr
+			$trans_no, $_POST['FromBankAccount'], $_POST['ToBankAccount'], $_POST['DatePaid'], $amnt_tr
 		))) {
-			display_error(sprintf(_("The bank transfer would result in exceed of authorized overdraft limit for transaction: %s #%s on %s."),
-			$systypes_array[$trans['type']], $problemTransaction['trans_no'], sql2date($problemTransaction['trans_date'])));
+			if (!array_key_exists('trans_no', $problemTransaction)) {
+				display_error(sprintf(
+					_("This bank transfer would result in exceeding authorized overdraft limit of the account (%s)"),
+					price_format(-$problemTransaction['amount'])
+				));
+			} else {
+				display_error(sprintf(
+					_("This bank transfer would result in exceeding authorized overdraft limit for transaction: %s #%s on %s."),
+					$systypes_array[$problemTransaction['type']], $problemTransaction['trans_no'], sql2date($problemTransaction['trans_date'])
+				));
+			}
 			set_focus('amount');
 			return false;
 		}
-	}
-	if ($trans = check_bank_account_history(-$amnt_tr, $_POST['FromBankAccount'], $_POST['DatePaid'])) {
-		display_error(sprintf(_("The bank transfer would result in exceed of authorized overdraft limit for transaction: %s #%s on %s."),
-			$systypes_array[$trans['type']], $trans['trans_no'], sql2date($trans['trans_date'])));
-		set_focus('amount');
-		return false;
+	} else {
+		if (null != ($problemTransaction = check_bank_account_history(-$amnt_tr, $_POST['FromBankAccount'], $_POST['DatePaid']))) {
+			if (!array_key_exists('trans_no', $problemTransaction)) {
+				display_error(sprintf(
+					_("This bank transfer would result in exceeding authorized overdraft limit of the account (%s)"),
+					price_format(-$problemTransaction['amount'])
+				));
+			} else {
+				display_error(sprintf(
+					_("This bank transfer would result in exceeding authorized overdraft limit for transaction: %s #%s on %s."),
+					$systypes_array[$problemTransaction['type']], $problemTransaction['trans_no'], sql2date($problemTransaction['trans_date'])
+				));
+			}
+			set_focus('amount');
+			return false;
+		}
 	}
 
 	if (isset($_POST['charge']) && !check_num('charge', 0))
