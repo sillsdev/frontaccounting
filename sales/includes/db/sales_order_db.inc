@@ -1,12 +1,12 @@
 <?php
 /**********************************************************************
     Copyright (C) FrontAccounting, LLC.
-	Released under the terms of the GNU General Public License, GPL, 
-	as published by the Free Software Foundation, either version 3 
+	Released under the terms of the GNU General Public License, GPL,
+	as published by the Free Software Foundation, either version 3
 	of the License, or (at your option) any later version.
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
     See the License here <http://www.gnu.org/licenses/gpl-3.0.html>.
 ***********************************************************************/
 //----------------------------------------------------------------------------------------
@@ -25,16 +25,16 @@ function add_sales_order(&$order)
 		freight_cost, from_stk_loc, delivery_date, payment_terms, total)
 		VALUES (" .db_escape($order_no) . "," .db_escape($order_type) . "," . db_escape($order->customer_id) .
 		 ", " .db_escape($order->trans_type) . "," .db_escape($order->Branch) . ", ".
-			db_escape($order->cust_ref) .",". 
-			db_escape($order->reference) .",". 
-			db_escape($order->Comments) .",'" . 
+			db_escape($order->cust_ref) .",".
+			db_escape($order->reference) .",".
+			db_escape($order->Comments) .",'" .
 			date2sql($order->document_date) . "', " .
 			db_escape($order->sales_type) . ", " .
-			db_escape($order->ship_via)."," . 
+			db_escape($order->ship_via)."," .
 			db_escape($order->deliver_to) . "," .
 			db_escape($order->delivery_address) . ", " .
-			db_escape($order->phone) . ", " . 
-			db_escape($order->freight_cost) .", " . 
+			db_escape($order->phone) . ", " .
+			db_escape($order->freight_cost) .", " .
 			db_escape($order->Location) .", " .
 			db_escape($del_date) . "," .
 			db_escape($order->payment) . "," .
@@ -55,7 +55,7 @@ function add_sales_order(&$order)
 	foreach ($order->line_items as $line)
 	{
 		if ($loc_notification == 1 && is_inventory_item($line->stock_id))
-			$loc = calculate_reorder_level($order->Location, $line, $st_ids, $st_names, $st_num, $st_reorder); 
+			$loc = calculate_reorder_level($order->Location, $line, $st_ids, $st_names, $st_num, $st_reorder);
 
 		$sql = "INSERT INTO ".TB_PREF."sales_order_details (order_no, trans_type, stk_code, description, unit_price, quantity, discount_percent) VALUES (";
 		$sql .= $order_no . ",".$order->trans_type .
@@ -87,12 +87,12 @@ function delete_sales_order($order_no, $trans_type)
 	begin_transaction();
 	hook_db_prevoid($trans_type, $order_no);
 
-	$sql = "DELETE FROM ".TB_PREF."sales_orders WHERE order_no=" . db_escape($order_no) 
+	$sql = "DELETE FROM ".TB_PREF."sales_orders WHERE order_no=" . db_escape($order_no)
 		. " AND trans_type=".db_escape($trans_type);
 
 	db_query($sql, "order Header Delete");
 
-	$sql = "DELETE FROM ".TB_PREF."sales_order_details WHERE order_no =" 
+	$sql = "DELETE FROM ".TB_PREF."sales_order_details WHERE order_no ="
 		.db_escape($order_no) . " AND trans_type=".db_escape($trans_type);
 	db_query($sql, "order Detail Delete");
 
@@ -156,7 +156,7 @@ function update_sales_order($order)
 		array_push($id_tokeep , $line->id);
 	}
 	$id_list = implode(', ', $id_tokeep);
-	
+
 	$sql = "DELETE FROM ".TB_PREF."sales_order_details WHERE order_no =" . db_escape($order_no) . " AND trans_type=".$order->trans_type;
 	$sql .= " AND id NOT IN ($id_list)";
 
@@ -173,10 +173,10 @@ function update_sales_order($order)
 	foreach ($order->line_items as $line)
 	{
 		if ($loc_notification == 1 && is_inventory_item($line->stock_id))
-			$loc = calculate_reorder_level($order->Location, $line, $st_ids, $st_names, $st_num, $st_reorder); 
+			$loc = calculate_reorder_level($order->Location, $line, $st_ids, $st_names, $st_num, $st_reorder);
 		if($line->id) {
 			$sql = "UPDATE ".TB_PREF."sales_order_details
-						SET description = ".db_escape($line->item_description) . ", 
+						SET description = ".db_escape($line->item_description) . ",
 								unit_price = ".db_escape($line->price) . ",
 								quantity = ".db_escape($line->quantity) . ",
 								discount_percent = ".db_escape($line->discount_percent) . "
@@ -235,12 +235,12 @@ function get_sales_order_header($order_no, $trans_type)
 	  .TB_PREF."cust_branch branch,"
 	  .TB_PREF."locations loc
 	WHERE sorder.order_type=stype.id
+		AND sorder.trans_type = " . db_escape($trans_type) ."
+		AND sorder.order_no = " . db_escape($order_no ) ."
 		AND branch.branch_code = sorder.branch_code
 		AND branch.tax_group_id = tax_group.id
 		AND sorder.debtor_no = cust.debtor_no
-		AND loc.loc_code = sorder.from_stk_loc
-		AND sorder.trans_type = " . db_escape($trans_type) ."
-		AND sorder.order_no = " . db_escape($order_no );
+		AND loc.loc_code = sorder.from_stk_loc";
 
 	$result = db_query($sql, "order Retreival");
 
@@ -273,7 +273,7 @@ function get_sales_order_details($order_no, $trans_type) {
 			.TB_PREF."stock_master.overhead_cost AS standard_cost
 	FROM ".TB_PREF."sales_order_details, ".TB_PREF."stock_master
 	WHERE ".TB_PREF."sales_order_details.stk_code = ".TB_PREF."stock_master.stock_id
-	AND order_no =" . db_escape($order_no) 
+	AND order_no =" . db_escape($order_no)
 		." AND trans_type = " . db_escape($trans_type) . " ORDER BY id";
 
 	return db_query($sql, "Retreive order Line Items");
@@ -295,7 +295,7 @@ function read_sales_order($order_no, &$order, $trans_type)
 	$order->set_branch($myrow["branch_code"], $myrow["tax_group_id"],
 	  $myrow["tax_group_name"], $myrow["contact_phone"]);
 
-	$order->set_sales_type($myrow["sales_type_id"], $myrow["sales_type"], 
+	$order->set_sales_type($myrow["sales_type_id"], $myrow["sales_type"],
 	    $myrow["tax_included"], $myrow["factor"]); // no default price calculations on edit
 
 	$order->set_location($myrow["from_stk_loc"], $myrow["location_name"]);
@@ -342,7 +342,7 @@ function sales_order_has_deliveries($order_no)
 		return true;  // 2010-04-21 added check for eventually voided deliveries, Joe Hunt
 	$sql = "SELECT order_ FROM ".TB_PREF."debtor_trans WHERE type=".ST_CUSTDELIVERY." AND order_=".db_escape($order_no);
 	$result = db_query($sql,"The related delivery notes could not be retreived");
-	return (db_num_rows($result) > 0);	
+	return (db_num_rows($result) > 0);
 }
 
 //----------------------------------------------------------------------------------------
@@ -365,9 +365,9 @@ function get_invoice_duedate($terms, $invdate)
 	{
 		return new_doc_date();
 	}
-	
+
 	$myrow = get_payment_terms($terms);
-	
+
 	if (!$myrow)
 		return $invdate;
 
@@ -381,9 +381,9 @@ function get_invoice_duedate($terms, $invdate)
 function get_customer_to_order($customer_id) {
 
 	// Now check to ensure this account is not on hold */
-	$sql = "SELECT cust.name, 
+	$sql = "SELECT cust.name,
 		  cust.address, "
-		  .TB_PREF."credit_status.dissallow_invoices, 
+		  .TB_PREF."credit_status.dissallow_invoices,
 		  cust.sales_type AS salestype,
 		  cust.dimension_id,
 		  cust.dimension2_id,
@@ -429,16 +429,16 @@ function get_branch_to_order($customer_id, $branch_id) {
   	    return db_query($sql,"Customer Branch Record Retreive");
 }
 
-function get_sql_for_sales_orders_view($selected_customer, $trans_type, $trans_no, $filter, 
+function get_sql_for_sales_orders_view($selected_customer, $trans_type, $trans_no, $filter,
 	$stock_item=null, $from='', $to='', $ref='', $location='', $customer_id=ALL_TEXT)
 {
 
-	$sql = "SELECT 
+	$sql = "SELECT
 			sorder.order_no,
 			sorder.reference,
 			debtor.name,
 			branch.br_name,"
-			.($filter=='InvoiceTemplates' 
+			.($filter=='InvoiceTemplates'
 				|| $filter=='DeliveryTemplates' ?
 			 "sorder.comments, " : "sorder.customer_ref, ")
 			."sorder.ord_date,
@@ -462,14 +462,14 @@ function get_sql_for_sales_orders_view($selected_customer, $trans_type, $trans_n
 
 	if (isset($trans_no) && $trans_no != "")
 	{
-		// search orders with number like 
+		// search orders with number like
 		$number_like = "%".$trans_no;
 		$sql .= " AND sorder.order_no LIKE ".db_escape($number_like);
 //				." GROUP BY sorder.order_no";
 	}
 	elseif ($ref != "")
 	{
-		// search orders with reference like 
+		// search orders with reference like
 		$number_like = "%".$ref."%";
 		$sql .= " AND sorder.reference LIKE ".db_escape($number_like);
 //				." GROUP BY sorder.order_no";
@@ -502,10 +502,10 @@ function get_sql_for_sales_orders_view($selected_customer, $trans_type, $trans_n
 
 		elseif ($filter=='InvoiceTemplates' || $filter=='DeliveryTemplates')
 			$sql .= " AND sorder.type=1";
-			
+
 		//Chaiatanya : New Filter
 		if ($customer_id != ALL_TEXT)
-			$sql .= " AND sorder.debtor_no = ".db_escape($customer_id);		
+			$sql .= " AND sorder.debtor_no = ".db_escape($customer_id);
 
 		$sql .= " GROUP BY sorder.order_no,
 					sorder.debtor_no,
