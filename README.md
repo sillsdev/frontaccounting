@@ -1,6 +1,6 @@
 # FrontAccounting ERP
 
-FrontAccounting is a web based accounting system suitable for small companies.  FrontAccounting is simple to use, with powerful features covering the entire ERP chain.
+[FrontAccounting](http://frontaccounting.com) is a web based accounting system suitable for small companies.  FrontAccounting is simple to use, with powerful features covering the entire ERP chain.
 
 ## Features
 
