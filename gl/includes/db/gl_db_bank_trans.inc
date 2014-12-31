@@ -102,7 +102,7 @@ function get_bank_trans_for_bank_account($bank_account, $from, $to)
 		AND ISNULL(v.date_)
 		AND trans_date >= '$from'
 		AND trans_date <= '$to'
-		AND amount > 0
+		AND amount != 0
 		ORDER BY trans_date, t.id";
 
 	return db_query($sql,"The transactions for '" . $bank_account . "' could not be retrieved");
@@ -169,21 +169,21 @@ function void_bank_trans($type, $type_no, $nested=false)
  * @param double $delta_amount tested change in bank balance at $date
  * @param int $bank_account
  * @param string $date
- * @param string $user
  * @return NULL|multitype:number string |multitype:
  */
-function check_bank_account_history($delta_amount, $bank_account, $date=null, $user=null)
+function check_bank_account_history($delta_amount, $bank_account, $date = null, $balance_offset = 0)
 {
 	if ($delta_amount >= 0 && isset($date))
 		 return null;	// amount increese is always safe
 
-	$balance = $date ? get_bank_account_limit($bank_account, $date, $user) : 0;
+	$balance = $date ? get_bank_account_limit($bank_account, $date) : 0;
 
 	if (!isset($balance) && isset($date))
 		return null;	// unlimited account
 
+	$balance += $balance_offset;
 	if (floatcmp($balance, -$delta_amount) < 0)
-		return array('amount' => $balance - $delta_amount, 'trans_date'=> $date);
+		return array('amount' => $balance + $delta_amount, 'trans_date'=> $date);
 
 	$balance += $delta_amount;
 

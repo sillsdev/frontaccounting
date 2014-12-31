@@ -200,39 +200,45 @@ function check_bank_transfer(
 
 	$transaction1 = db_fetch($dbResult);
 	$transaction2 = db_fetch($dbResult);
+	$fromAccount = $transaction1;
 	$toAccount = $transaction2;
 	if ($toAccount['amount'] < 0.0) {
 		$toAccount = $transaction1;
+		$fromAccount = $transaction2;
 	}
-	$deltaAmount = -$toAccount['amount'];
-	$problemTransaction = check_bank_account_history($deltaAmount, $toAccount['bank_act'], sql2date($toAccount['trans_date']));
+	// There are four accounts to consider:
+	// 1) The original from account that is being voided. This results in funds being put back which is always fine.
+	// 2) The original to account that is being voided. This results in funds being removed which may result in a
+	//    negative balance in the account at some time and therefore needs to be checked.
+	$problemTransaction = check_bank_account_history(-$toAccount['amount'], $toAccount['bank_act'], sql2date($fromAccount['trans_date']), 0);
 	if ($problemTransaction) {
-		// If the destination account is the same as that being edited, it may be that this edit will resolve the problem of voiding.
+		// If the destination account is the same as that being edited, it may be that this edit will resolve the
+		// problem of voiding.
 		if ($to_account == $toAccount['bank_act'] && sql_date1_greater_date2($problemTransaction['trans_date'], date2sql($date_)) == 1) {
 			$problemTransaction['amount'] += $amount;
 			if ($problemTransaction['amount'] >= 0) {
 				$problemTransaction = null;
 			}
 		}
+		if (null != $problemTransaction) {
+			return $problemTransaction;
+		}
 	}
+
+	// 3) The edited from account, that is having funds removed which may result in a
+	//    negative balance in the account at some time and therefore needs to be checked.
+	$balance_offset = 0;
+	if ($from_account == $fromAccount['bank_act']) {
+		// If the edited from_account is the same as the original transaction, then add the amount from the
+		// original from transaction when checking the history.
+		$balance_offset = -$fromAccount['amount'];
+	}
+	$problemTransaction = check_bank_account_history(-$amount, $from_account, sql2date($fromAccount['trans_date']), $balance_offset);
+
+	// 4) The edited to account, that is having funds added which is always ok.
+
 	return $problemTransaction;
 
-}
-
-function update_bank_transfer(
-	$trans_no, $from_account, $to_account, $date_,
-	$amount, $ref, $memo_, $charge=0, $target_amount=0)
-{
-	begin_transaction();
-	delete_comments(ST_BANKTRANSFER, $trans_no);
-	void_bank_trans(ST_BANKTRANSFER, $trans_no, true);
-	void_gl_trans(ST_BANKTRANSFER, $trans_no, true);
-	$new_trans_no = add_bank_transfer(
-		$from_account, $to_account, $date_, $amount,
-		$ref, $memo_, $charge, $target_amount
-	);
-	commit_transaction();
-	return $new_trans_no;
 }
 
 function update_bank_transfer(
