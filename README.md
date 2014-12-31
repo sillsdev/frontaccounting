@@ -6,27 +6,27 @@ FrontAccounting is a web based accounting system suitable for small companies.  
 
 * Sales orders
 * Delivery notes
-* Customer invoices (including direct invoice
+* Customer invoices (including direct invoice)
 * Customer credit notes
-
+&nbsp;
 * Purchase orders
 * Good received notes
 * Supplier invoices (including direct invoice)
 * Supplier credit notes
-
+&nbsp;
 * Accounts receivable
 * Accounts payable
 * General Ledger with Budget
-
+&nbsp;
 * Bank deposits
 * Allocation of deposits against Customer Invoice
 * Bank payments
 * Allocation of payments against Supplier Invoice
-
+&nbsp;
 * Items and inventory
 * Stock
 * Manufacturing
-
+&nbsp;
 * Multiple currencies
 * Multiple languages
 * Multiple companies
