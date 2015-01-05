@@ -1,12 +1,12 @@
 <?php
 /**********************************************************************
     Copyright (C) FrontAccounting, LLC.
-	Released under the terms of the GNU General Public License, GPL, 
-	as published by the Free Software Foundation, either version 3 
+	Released under the terms of the GNU General Public License, GPL,
+	as published by the Free Software Foundation, either version 3
 	of the License, or (at your option) any later version.
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
     See the License here <http://www.gnu.org/licenses/gpl-3.0.html>.
 ***********************************************************************/
 $page_security = 'SA_ITEMSSTATVIEW';
@@ -30,7 +30,7 @@ include_once($path_to_root . "/includes/data_checks.inc");
 
 include_once($path_to_root . "/inventory/includes/inventory_db.inc");
 
-if (list_updated('stock_id')) 
+if (list_updated('stock_id'))
 	$Ajax->activate('status_tbl');
 //----------------------------------------------------------------------------------------------------
 
@@ -44,12 +44,14 @@ if (!isset($_POST['stock_id']))
 
 if (!@$_GET['popup'])
 {
-	echo "<center> " . _("Item:"). " ";
-	echo stock_costable_items_list('stock_id', $_POST['stock_id'], false, true);
-}	
-echo "<br>";
+// 	echo "<center> " . _("Item:"). " ";
+// 	echo stock_costable_items_list('stock_id', $_POST['stock_id'], false, true);
+	ControlRenderer::get()->table_add_cells(array(_("Item:"), stock_costable_items_list('stock_id', $_POST['stock_id'], false, true)));
+	end_form();
+}
+// echo "<br>";
 
-echo "<hr></center>";
+// echo "<hr></center>";
 
 set_global_stock_item($_POST['stock_id']);
 
@@ -126,6 +128,6 @@ if (!@$_GET['popup'])
 {
 	end_form();
 	end_page(@$_GET['popup'], false, false);
-}	
+}
 
 ?>

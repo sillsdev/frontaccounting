@@ -1,12 +1,12 @@
 <?php
 /**********************************************************************
     Copyright (C) FrontAccounting, LLC.
-	Released under the terms of the GNU General Public License, GPL, 
-	as published by the Free Software Foundation, either version 3 
+	Released under the terms of the GNU General Public License, GPL,
+	as published by the Free Software Foundation, either version 3
 	of the License, or (at your option) any later version.
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
     See the License here <http://www.gnu.org/licenses/gpl-3.0.html>.
 ***********************************************************************/
 $page_security = 'SA_BANKTRANSVIEW';
@@ -14,6 +14,7 @@ $path_to_root="../..";
 include_once($path_to_root . "/includes/session.inc");
 
 include_once($path_to_root . "/includes/date_functions.inc");
+include_once($path_to_root . "/includes/db_pager.inc");
 include_once($path_to_root . "/includes/ui.inc");
 include_once($path_to_root . "/includes/data_checks.inc");
 
@@ -59,7 +60,7 @@ end_form();
 if (!isset($_POST['bank_account']))
 	$_POST['bank_account'] = "";
 
-$result = get_bank_trans_for_bank_account($_POST['bank_account'], $_POST['TransAfterDate'], $_POST['TransToDate']);	
+$result = get_bank_trans_for_bank_account($_POST['bank_account'], $_POST['TransAfterDate'], $_POST['TransToDate']);
 
 div_start('trans_tbl');
 $act = get_bank_account($_POST["bank_account"]);
@@ -68,7 +69,7 @@ display_heading($act['bank_account_name']." - ".$act['bank_curr_code']);
 start_table(TABLESTYLE);
 
 $th = array(_("Type"), _("#"), _("Reference"), _("Date"),
-	_("Debit"), _("Credit"), _("Balance"), _("Person/Item"), _("Memo"), "");
+	_("Debit"), _("Credit"), _("Balance"), _("Person/Item"), _("Memo"), "", "");
 table_header($th);
 
 $bfw = get_balance_before_for_bank_account($_POST['bank_account'], $_POST['TransAfterDate']);
@@ -78,13 +79,13 @@ start_row("class='inquirybg' style='font-weight:bold'");
 label_cell(_("Opening Balance")." - ".$_POST['TransAfterDate'], "colspan=4");
 display_debit_or_credit_cells($bfw);
 label_cell("");
-label_cell("", "colspan=2");
+label_cell("", "colspan=4");
 
 end_row();
 $running_total = $bfw;
-if ($bfw > 0 ) 
+if ($bfw > 0 )
 	$debit += $bfw;
-else 
+else
 	$credit += $bfw;
 $j = 1;
 $k = 0; //row colour counter
@@ -105,10 +106,19 @@ while ($myrow = db_fetch($result))
 	label_cell(payment_person_name($myrow["person_type_id"],$myrow["person_id"]));
 	label_cell(get_comments_string($myrow["type"], $myrow["trans_no"]));
 	label_cell(get_gl_view_str($myrow["type"], $myrow["trans_no"]));
-	end_row();
- 	if ($myrow["amount"] > 0 ) 
+	if ($myrow["type"] == ST_BANKTRANSFER) {
+		$link = pager_link(
+			_("Edit"),
+			sprintf("/gl/bank_transfer.php?ModifyTransfer=Yes&trans_no=%d", $myrow["trans_no"]),
+			ICON_EDIT
+		);
+		label_cell($link);
+	} else {
+		label_cell("");
+	}
+ 	if ($myrow["amount"] > 0 )
  		$debit += $myrow["amount"];
- 	else 
+ 	else
  		$credit += $myrow["amount"];
 
 	if ($j == 12)
@@ -126,8 +136,7 @@ amount_cell($debit);
 amount_cell(-$credit);
 //display_debit_or_credit_cells($running_total);
 amount_cell($debit+$credit);
-label_cell("");
-label_cell("", "colspan=2");
+label_cell("", "colspan=4");
 end_row();
 end_table(2);
 div_end();

@@ -1,12 +1,12 @@
 <?php
 /**********************************************************************
     Copyright (C) FrontAccounting, LLC.
-	Released under the terms of the GNU General Public License, GPL, 
-	as published by the Free Software Foundation, either version 3 
+	Released under the terms of the GNU General Public License, GPL,
+	as published by the Free Software Foundation, either version 3
 	of the License, or (at your option) any later version.
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
     See the License here <http://www.gnu.org/licenses/gpl-3.0.html>.
 ***********************************************************************/
 $page_security = 'SA_SECROLES';
@@ -21,14 +21,14 @@ include_once($path_to_root . "/includes/ui.inc");
 include_once($path_to_root . "/includes/access_levels.inc");
 include_once($path_to_root . "/admin/db/security_db.inc");
 
-$new_role = get_post('role')=='' || get_post('cancel') || get_post('clone'); 
+$new_role = get_post('role')=='' || get_post('cancel') || get_post('clone');
 //--------------------------------------------------------------------------------------------------
-// Following compare function is used for sorting areas 
+// Following compare function is used for sorting areas
 // in such a way that security areas defined by module/plugin
-// is properly placed under related section regardless of 
+// is properly placed under related section regardless of
 // unique extension number, with order inside sections preserved.
 //
-function comp_areas($area1, $area2) 
+function comp_areas($area1, $area2)
 {
 	$sec_comp = ($area1[0]&0xff00)-($area2[0]&0xff00);
 	return $sec_comp == 0 ? ($area1[2]-$area2[2]) : $sec_comp;
@@ -75,7 +75,7 @@ if (get_post('addupdate'))
 			|| !isset($_POST['Section'.SS_SETUP])) {
 			display_error(_("Access level edition in Company setup section have to be enabled for your account."));
 	      	$input_error = 1;
-	      	set_focus(!isset($_POST['Section'.SS_SETUP]) 
+	      	set_focus(!isset($_POST['Section'.SS_SETUP])
 	      		? 'Section'.SS_SETUP : 'Area'.$security_areas['SA_SECROLES'][0]);
 		}
 	}
@@ -99,14 +99,14 @@ if (get_post('addupdate'))
 
 		$sections = array_values($sections);
 
-     	if ($new_role) 
+     	if ($new_role)
        	{
-			add_security_role($_POST['name'], $_POST['description'], $sections, $areas); 
+			add_security_role($_POST['name'], $_POST['description'], $sections, $areas);
 			display_notification(_("New security role has been added."));
        	} else
        	{
-			update_security_role($_POST['role'], $_POST['name'], $_POST['description'], 
-				$sections, $areas); 
+			update_security_role($_POST['role'], $_POST['name'], $_POST['description'],
+				$sections, $areas);
 			update_record_status($_POST['role'], get_post('inactive'),
 				'security_roles', 'id');
 
@@ -149,7 +149,7 @@ if (!isset($_POST['role']) || get_post('clone') || list_updated('role')) {
 		$_POST['name'] = $row['role'];
 //	if ($row['inactive']
 //		$_POST['inactive'] = 1;
-	
+
 		$_POST['inactive'] = $row['inactive'];
 		$access = $row['areas'];
 		$sections = $row['sections'];
@@ -180,7 +180,6 @@ $new_role = get_post('role')=='';
 check_cells(_("Show inactive:"), 'show_inactive', null, true);
 end_row();
 end_table();
-echo "<hr>";
 
 if (get_post('_show_inactive_update')) {
 	$Ajax->activate('role');
@@ -203,27 +202,27 @@ end_table(1);
 	$ext = $sec = $m = -1;
 
 	foreach(sort_areas($security_areas) as $area =>$parms ) {
-		// system setup areas are accessable only for site admins i.e. 
+		// system setup areas are accessable only for site admins i.e.
 		// admins of first registered company
 		if (user_company() && (($parms[0]&0xff00) == SS_SADMIN)) continue;
-		
+
 		$newsec = ($parms[0]>>8)&0xff;
 		$newext  = $parms[0]>>16;
 		if ($newsec != $sec || (($newext != $ext) && ($newsec>99)))
 		{ // features set selection
-			$ext = $newext; 
+			$ext = $newext;
 			$sec = $newsec;
 			$m = $parms[0] & ~0xff;
 //			if(!isset($security_sections[$m]))
 //			 display_error(sprintf("Bad section %X:", $m));
-			label_row($security_sections[$m].':', 
-				checkbox( null, 'Section'.$m, null, true, 
+			label_row($security_sections[$m].':',
+				checkbox( null, 'Section'.$m, null, true,
 					_("On/off set of features")),
 			"class='tableheader2'", "class='tableheader'");
 		}
 		if (check_value('Section'.$m)) {
 				alt_table_row_color($k);
-				check_cells($parms[1], 'Area'.$parms[0], null, 
+				check_cells($parms[1], 'Area'.$parms[0], null,
 					false, '', "align='center'");
 			end_row();
 		} else {
@@ -235,12 +234,12 @@ div_end();
 
 div_start('controls');
 
-if ($new_role) 
+if ($new_role)
 {
 	submit_center_first('Update', _("Update view"), '', null);
 	submit_center_last('addupdate', _("Insert New Role"), '', 'default');
-} 
-else 
+}
+else
 {
 	submit_center_first('addupdate', _("Save Role"), '', 'default');
 	submit('Update', _("Update view"), true, '', null);

@@ -1,0 +1,8 @@
+/company/
+/modules/
+/config.php
+/config_db.php
+/faillog.php
+/installed_extensions.php
+/lang/installed_languages.inc
+/tmp/

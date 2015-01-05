@@ -1,12 +1,12 @@
 <?php
 /**********************************************************************
     Copyright (C) FrontAccounting, LLC.
-	Released under the terms of the GNU General Public License, GPL, 
-	as published by the Free Software Foundation, either version 3 
+	Released under the terms of the GNU General Public License, GPL,
+	as published by the Free Software Foundation, either version 3
 	of the License, or (at your option) any later version.
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
     See the License here <http://www.gnu.org/licenses/gpl-3.0.html>.
 ***********************************************************************/
 /*
@@ -22,7 +22,7 @@ this can be a string either "d/m/Y" for UK/Australia/New Zealand dates or
 function __date($year, $month, $day)
 {
 	global $dateseps, $tmonths;
-	
+
 	$how = user_date_format();
 	$sep = $dateseps[user_date_sep()];
 	$day = (int)$day;
@@ -33,7 +33,7 @@ function __date($year, $month, $day)
 			$day = "0".$day;
 		if ($month < 10)
 			$month = "0".$month;
-	}		
+	}
 	if ($how == 0)
 		return $month.$sep.$day.$sep.$year;
 	elseif ($how == 1)
@@ -48,7 +48,7 @@ function __date($year, $month, $day)
 		return $year.$sep.$tmonths[$month].$sep.$day;
 }
 
-function is_date($date_) 
+function is_date($date_)
 {
 	global $dateseps;
 
@@ -59,7 +59,7 @@ function is_date($date_)
 
 	$date_ = trim($date_);
 	$date = str_replace($sep, "", $date_);
-	
+
 	if ($how > 2)
 	{
 		global $tmonths;
@@ -69,13 +69,13 @@ function is_date($date_)
 			$day = $dd[1];
 			$month = array_search($dd[0], $tmonths);
 			$year = $dd[2];
-		} 
+		}
 		elseif ($how == 4)
 		{
 			$day = $dd[0];
 			$month = array_search($dd[1], $tmonths);
 			$year = $dd[2];
-		} 
+		}
 		else
 		{
 			$day = $dd[2];
@@ -92,13 +92,13 @@ function is_date($date_)
 			$day = substr($date,2,2);
 			$month = substr($date,0,2);
 			$year = substr($date,4,2);
-		} 
+		}
 		elseif ($how == 1)
 		{
 			$day = substr($date,0,2);
 			$month = substr($date,2,2);
 			$year = substr($date,4,2);
-		} 
+		}
 		else
 		{
 			$day = substr($date,4,2);
@@ -113,13 +113,13 @@ function is_date($date_)
 			$day = substr($date,2,2);
 			$month = substr($date,0,2);
 			$year = substr($date,4,4);
-		} 
+		}
 		elseif ($how == 1)
 		{
 			$day = substr($date,0,2);
 			$month = substr($date,2,2);
 			$year = substr($date,4,4);
-		} 
+		}
 		else
 		{
 			$day = substr($date,6,2);
@@ -127,7 +127,7 @@ function is_date($date_)
 			$year = substr($date,0,4);
 		}
 	}
-	if (!isset($year)|| (int)$year > 9999) 
+	if (!isset($year)|| (int)$year > 9999)
 	{
 		return 0;
 	}
@@ -136,9 +136,9 @@ function is_date($date_)
 	{
 		global $date_system;
 		if ($date_system == 1)
-			list($year, $month, $day) = jalali_to_gregorian($year, $month, $day);  
-		elseif ($date_system == 2)	
-			list($year, $month, $day) = islamic_to_gregorian($year, $month, $day);  
+			list($year, $month, $day) = jalali_to_gregorian($year, $month, $day);
+		elseif ($date_system == 2)
+			list($year, $month, $day) = islamic_to_gregorian($year, $month, $day);
 		if (checkdate((int)$month, (int)$day, (int)$year))
 		{
 			return 1;
@@ -154,7 +154,7 @@ function is_date($date_)
 	}
 } //end of is_date function
 
-function Today() 
+function Today()
 {
 	global $date_system;
 
@@ -163,12 +163,12 @@ function Today()
 	$day = date("j");
 	if ($date_system == 1)
 		list($year, $month, $day) = gregorian_to_jalali($year, $month, $day);
-	elseif ($date_system == 2)	
+	elseif ($date_system == 2)
 		list($year, $month, $day) = gregorian_to_islamic($year, $month, $day);
-	return __date($year, $month, $day);	
+	return __date($year, $month, $day);
 }
 
-function Now() 
+function Now()
 {
 	if (user_date_format() == 0)
 		return date("h:i a");
@@ -201,12 +201,12 @@ function is_date_in_fiscalyear($date, $convert=false)
         $date2 = $date;
 
     if ($_SESSION["wa_current_user"]->can_access('SA_MULTIFISCALYEARS')) // allow all open years for this one
-        return is_date_in_fiscalyears($date2, false); 
+        return is_date_in_fiscalyears($date2, false);
 
     $myrow = get_current_fiscalyear();
     if ($myrow['closed'] == 1)
         return 0;
-    
+
     $begin = sql2date($myrow['begin']);
     $end = sql2date($myrow['end']);
     if (date1_greater_date2($begin, $date2) || date1_greater_date2($date2, $end))
@@ -240,7 +240,7 @@ function begin_month($date)
     list($day, $month, $year) = explode_date_to_dmy($date);
     if ($date_system == 1)
     	list($year, $month, $day) = gregorian_to_jalali($year, $month, $day);
-    elseif ($date_system == 2)	
+    elseif ($date_system == 2)
     	list($year, $month, $day) = gregorian_to_islamic($year, $month, $day);
    	return __date($year, $month, 1);
 }
@@ -289,7 +289,7 @@ function add_days($date, $days) // accepts negative values as well
     {
     	if ($date_system == 1)
     		list($year, $month, $day) = gregorian_to_jalali(date("Y", $timet), date("n", $timet), date("j", $timet));
-    	elseif ($date_system == 2) 	
+    	elseif ($date_system == 2)
     		list($year, $month, $day) = gregorian_to_islamic(date("Y", $timet), date("n", $timet), date("j", $timet));
     	return __date($year, $month, $day);
     }
@@ -312,7 +312,7 @@ function add_months($date, $months) // accepts negative values as well
     {
     	if ($date_system == 1)
     		list($year, $month, $day) = gregorian_to_jalali(date("Y", $timet), date("n", $timet), date("j", $timet));
-    	elseif ($date_system == 2) 	
+    	elseif ($date_system == 2)
     		list($year, $month, $day) = gregorian_to_islamic(date("Y", $timet), date("n", $timet), date("j", $timet));
     	return __date($year, $month, $day);
     }
@@ -329,7 +329,7 @@ function add_years($date, $years) // accepts negative values as well
     {
     	if ($date_system == 1)
     		list($year, $month, $day) = gregorian_to_jalali(date("Y", $timet), date("n", $timet), date("j", $timet));
-    	elseif ($date_system == 2) 	
+    	elseif ($date_system == 2)
     		list($year, $month, $day) = gregorian_to_islamic(date("Y", $timet), date("n", $timet), date("j", $timet));
     	return __date($year, $month, $day);
     }
@@ -339,24 +339,24 @@ function add_years($date, $years) // accepts negative values as well
 
 //_______________________________________________________________
 
-function sql2date($date_) 
+function sql2date($date_)
 {
 	global $date_system;
 
 	//for MySQL dates are in the format YYYY-mm-dd
 
-	if (strpos($date_, "/")) 
+	if (strpos($date_, "/"))
 	{ // In MySQL it could be either / or -
 		list($year, $month, $day) = explode("/", $date_);
-	} 
-	elseif (strpos ($date_, "-")) 
+	}
+	elseif (strpos ($date_, "-"))
 	{
 		list($year, $month, $day) = explode("-", $date_);
 	}
 	if (!isset($day)) // data format error
 		return "";
 
-	if (strlen($day) > 4) 
+	if (strlen($day) > 4)
 	{  /*chop off the time stuff */
 		$day = substr($day, 0, 2);
 	}
@@ -364,7 +364,7 @@ function sql2date($date_)
 		list($year, $month, $day) = gregorian_to_jalali($year, $month, $day);
 	elseif ($date_system == 2)
 		list($year, $month, $day) = gregorian_to_islamic($year, $month, $day);
-	return __date($year, $month, $day);	
+	return __date($year, $month, $day);
 } // end function sql2date
 
 
@@ -393,39 +393,39 @@ and converts to a yyyy/mm/dd format */
 	{
 		global $tmonths;
 		$month = array_search($month, $tmonths);
-	}	
+	}
 //to modify assumption in 2030
 	if ($date_system == 0 || $date_system == 3)
 	{
 		if ((int)$year < 60)
 		{
 			$year = "20".$year;
-		} 
+		}
 		elseif ((int)$year > 59 && (int)$year < 100)
 		{
 			$year = "19".$year;
 		}
-	}	
+	}
 	if ((int)$year > 9999)
 	{
 		return 0;
 	}
 	if ($date_system == 1)
-		list($year, $month, $day) = jalali_to_gregorian($year, $month, $day); 
+		list($year, $month, $day) = jalali_to_gregorian($year, $month, $day);
 	elseif ($date_system == 2)
-		list($year, $month, $day) = islamic_to_gregorian($year, $month, $day); 
+		list($year, $month, $day) = islamic_to_gregorian($year, $month, $day);
 
 	return sprintf("%04d-%02d-%02d", $year, $month, $day);
 }// end of function
 
-function date1_greater_date2 ($date1, $date2) 
+/**
+ * Returns 1 (true) if sql date1 is greater than sql date 2
+ * @param string $date1 sql date 1
+ * @param string $date2 sql date 2
+ * @return int
+ */
+function sql_date1_greater_date2 ($date1, $date2)
 {
-
-/* returns 1 true if date1 is greater than date_ 2 */
-
-	$date1 = date2sql($date1);
-	$date2 = date2sql($date2);
-
 	@list($year1, $month1, $day1) = explode("-", $date1);
 	@list($year2, $month2, $day2) = explode("-", $date2);
 
@@ -450,8 +450,24 @@ function date1_greater_date2 ($date1, $date2)
 	return 0;
 }
 
+/**
+ * Returns 1 (true) if date1 is greater than date 2
+ * @param string $date1 date 1
+ * @param string $date2 date 2
+ * @return int
+ * @see sql_date1_greater_date2 for the sql date version
+ */
+function date1_greater_date2 ($date1, $date2)
+{
 
-function date_diff2 ($date1, $date2, $period) 
+	$date1 = date2sql($date1);
+	$date2 = date2sql($date2);
+
+	return sql_date1_greater_date2($date1, $date2);
+}
+
+
+function date_diff2 ($date1, $date2, $period)
 {
 
 /* expects dates in the format specified in $DefaultDateFormat - period can be one of 'd','w','y','m'
@@ -469,7 +485,7 @@ provided that both dates are after 1970. Also only works for dates up to the yea
 
 /* difference is the number of seconds between each date negative if date_ 2 > date_ 1 */
 
-	switch ($period) 
+	switch ($period)
 	{
 		case "d":
 			return (int)($difference / (24 * 60 * 60));
@@ -489,7 +505,7 @@ provided that both dates are after 1970. Also only works for dates up to the yea
 function explode_date_to_dmy($date_)
 {
 	$date = date2sql($date_);
-	if ($date == "") 
+	if ($date == "")
 	{
 		return array(0,0,0);
 	}
@@ -497,12 +513,12 @@ function explode_date_to_dmy($date_)
 	return array($day, $month, $year);
 }
 
-function div($a, $b) 
+function div($a, $b)
 {
     return (int) ($a / $b);
 }
 /* Based on convertor to and from Gregorian and Jalali calendars.
-   Copyright (C) 2000  Roozbeh Pournader and Mohammad Toossi 
+   Copyright (C) 2000  Roozbeh Pournader and Mohammad Toossi
    Released under GNU General Public License */
 
 function gregorian_to_jalali ($g_y, $g_m, $g_d)
@@ -531,7 +547,7 @@ function gregorian_to_jalali ($g_y, $g_m, $g_d)
 
    	$j_day_no %= 1461;
 
-   	if ($j_day_no >= 366) 
+   	if ($j_day_no >= 366)
    	{
       	$jy += div($j_day_no - 1, 365);
       	$j_day_no = ($j_day_no - 1) % 365;
@@ -581,7 +597,7 @@ function jalali_to_gregorian($j_y, $j_m, $j_d)
    	$gy += 4 * div($g_day_no, 1461); /* 1461 = 365*4 + 4/4 */
    	$g_day_no %= 1461;
 
-   	if ($g_day_no >= 366) 
+   	if ($g_day_no >= 366)
    	{
       	$leap = false;
 
@@ -597,31 +613,31 @@ function jalali_to_gregorian($j_y, $j_m, $j_d)
 
    	return array($gy, $gm, $gd);
 }
-/* Based on Hidri Date Script 
+/* Based on Hidri Date Script
    Released under GNU General Public License */
 function gregorian_to_islamic($g_y, $g_m, $g_d)
 {
-	$y = $g_y;   
+	$y = $g_y;
 	$m = $g_m;
 	$d = $g_d;
-	if (($y > 1582) || (($y == 1582) && ($m > 10)) || (($y == 1582) && 
-		($m == 10) && ($d > 14))) 
+	if (($y > 1582) || (($y == 1582) && ($m > 10)) || (($y == 1582) &&
+		($m == 10) && ($d > 14)))
 	{
-		$jd = (int)((1461 * ($y + 4800 + (int)(($m - 14) / 12)))/ 4) + 
-			(int)((367 * ($m - 2 - 12 * ((int)(($m - 14) / 12)))) / 12) - 
+		$jd = (int)((1461 * ($y + 4800 + (int)(($m - 14) / 12)))/ 4) +
+			(int)((367 * ($m - 2 - 12 * ((int)(($m - 14) / 12)))) / 12) -
 			(int)((3 * ((int)(($y + 4900 + (int)(($m - 14) / 12)) / 100))) / 4) + $d - 32075;
-	} 
-	else 
+	}
+	else
 	{
-		$jd = 367 * $y - (int)((7 * ($y + 5001 + (int)(($m - 9) / 7))) / 4) + 
+		$jd = 367 * $y - (int)((7 * ($y + 5001 + (int)(($m - 9) / 7))) / 4) +
 			(int)((275 * $m) / 9) + $d + 1729777;
 	}
 	$l = $jd - 1948440 + 10632;
 	$n = (int)(($l - 1) / 10631);
 	$l = $l - 10631 * $n + 354;
-	$j = ((int)((10985 - $l) / 5316)) * ((int)((50 * $l) / 17719)) + 
+	$j = ((int)((10985 - $l) / 5316)) * ((int)((50 * $l) / 17719)) +
 		((int)($l / 5670)) * ((int)((43 * $l) / 15238));
-	$l = $l - ((int)((30 - $j) / 15)) * ((int)((17719 * $j) / 50)) - 
+	$l = $l - ((int)((30 - $j) / 15)) * ((int)((17719 * $j) / 50)) -
 		((int)($j / 16)) * ((int)((15238 * $j) / 43)) + 29;
 	$m = (int)((24 * $l) / 709);
 	$d = $l - (int)((709 * $m) / 24);
@@ -631,7 +647,7 @@ function gregorian_to_islamic($g_y, $g_m, $g_d)
 
 function islamic_to_gregorian($i_y, $i_m, $i_d)
 {
-	$y = $i_y;   
+	$y = $i_y;
 	$m = $i_m;
 	$d = $i_d;
 
@@ -648,8 +664,8 @@ function islamic_to_gregorian($i_y, $i_m, $i_d)
 		$l= (int)($j / 11);
 		$m = $j + 2 - 12 * $l;
 		$y = 100 * ($n - 49) + $i + $l;
-	} 
-	else 
+	}
+	else
 	{
 		$j = $jd + 1402;
 		$k = (int)(($j - 1) / 1461);
