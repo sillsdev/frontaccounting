@@ -1,18 +1,18 @@
 <?php
 /**********************************************************************
     Copyright (C) FrontAccounting, LLC.
-	Released under the terms of the GNU General Public License, GPL, 
-	as published by the Free Software Foundation, either version 3 
+	Released under the terms of the GNU General Public License, GPL,
+	as published by the Free Software Foundation, either version 3
 	of the License, or (at your option) any later version.
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
     See the License here <http://www.gnu.org/licenses/gpl-3.0.html>.
 ***********************************************************************/
 $path_to_root = "..";
 include_once($path_to_root . "/includes/ui/items_cart.inc");
 include_once($path_to_root . "/includes/session.inc");
-$page_security = isset($_GET['NewPayment']) || 
+$page_security = isset($_GET['NewPayment']) ||
 	@($_SESSION['pay_items']->trans_type==ST_BANKPAYMENT)
  ? 'SA_PAYMENT' : 'SA_DEPOSIT';
 
@@ -150,10 +150,10 @@ function create_cart($type, $trans_no)
 		$bank_trans = db_fetch(get_bank_trans($type, $trans_no));
 		$_POST['bank_account'] = $bank_trans["bank_act"];
 		$_POST['PayType'] = $bank_trans["person_type_id"];
-		
+
 		if ($bank_trans["person_type_id"] == PT_CUSTOMER)
 		{
-			$trans = get_customer_trans($trans_no, $type);	
+			$trans = get_customer_trans($trans_no, $type);
 			$_POST['person_id'] = $trans["debtor_no"];
 			$_POST['PersonDetailID'] = $trans["branch_code"];
 		}
@@ -166,7 +166,7 @@ function create_cart($type, $trans_no)
 			$_POST['person_id'] = $bank_trans["person_id"];
 		elseif ($bank_trans["person_type_id"] == PT_QUICKENTRY)
 			$_POST['person_id'] = $bank_trans["person_id"];
-		else 
+		else
 			$_POST['person_id'] = $bank_trans["person_id"];
 
 		$cart->memo_ = get_comments_string($type, $trans_no);
@@ -192,7 +192,7 @@ function create_cart($type, $trans_no)
 		// apply exchange rate
 		foreach($cart->gl_items as $line_no => $line)
 			$cart->gl_items[$line_no]->amount *= $ex_rate;
-		
+
 	} else {
 		$cart->reference = $Refs->get_next($cart->trans_type);
 		$cart->tran_date = new_doc_date();
@@ -266,7 +266,7 @@ function check_trans()
 		display_error(_("The entered date is not in fiscal year."));
 		set_focus('date_');
 		$input_error = 1;
-	} 
+	}
 
 	if (get_post('PayType')==PT_CUSTOMER && (!get_post('person_id') || !get_post('PersonDetailID'))) {
 		display_error(_("You have to select customer and customer branch."));
@@ -348,7 +348,7 @@ function handle_update_item()
 	$amount = ($_SESSION['pay_items']->trans_type==ST_BANKPAYMENT ? 1:-1) * input_num('amount');
     if($_POST['UpdateItem'] != "" && check_item_data())
     {
-    	$_SESSION['pay_items']->update_gl_item($_POST['Index'], $_POST['code_id'], 
+    	$_SESSION['pay_items']->update_gl_item($_POST['Index'], $_POST['code_id'],
     	    $_POST['dimension_id'], $_POST['dimension2_id'], $amount , $_POST['LineMemo']);
     }
 	line_start_focus();
@@ -390,7 +390,7 @@ if (isset($_POST['CancelItemChanges']))
 
 if (isset($_POST['go']))
 {
-	display_quick_entries($_SESSION['pay_items'], $_POST['person_id'], input_num('totamount'), 
+	display_quick_entries($_SESSION['pay_items'], $_POST['person_id'], input_num('totamount'),
 		$_SESSION['pay_items']->trans_type==ST_BANKPAYMENT ? QE_PAYMENT : QE_DEPOSIT);
 	$_POST['totamount'] = price_format(0); $Ajax->activate('totamount');
 	line_start_focus();
