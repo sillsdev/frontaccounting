@@ -325,7 +325,8 @@ if (isset($_POST['Process']) && !check_trans())
 
 function check_item_data()
 {
-	if (!check_num('amount', 0))
+	// if (!check_num('amount', 0))
+	if (!check_num('amount'))
 	{
 		display_error( _("The amount entered is not a valid number or is less than zero."));
 		set_focus('amount');
