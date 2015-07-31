@@ -78,6 +78,9 @@ function get_account_types($all=false, $class_id=false, $parent=false)
 
 function get_account_type($id)
 {
+	if (!$id) {
+		return '';
+	}
 	$sql = "SELECT * FROM ".TB_PREF."chart_types WHERE id = ".db_escape($id);
 
 	$result = db_query($sql, "could not get account type");
