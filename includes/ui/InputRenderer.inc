@@ -112,6 +112,13 @@ class InputRenderer
 	}
 
 	// ---------------------------------------------------------------------------------
+	//
+	//  Thanks to hidden fields buffering hidden() helper can be used in arbitrary places and 
+	//  proper html structure is still preserved. Buffered hidden fields are output on the nearest 
+	//  table or form closing tag (see output_hidden()).
+	//
+	var $hidden_fields = array();
+
 	function hidden($name, $value = null, $echo = true)
 	{
 		global $Ajax;
@@ -122,10 +129,24 @@ class InputRenderer
 		$ret = "<input type=\"hidden\" name=\"$name\" value=\"$value\">";
 		$Ajax->addUpdate($name, $name, $value);
 		if ($echo)
-			echo $ret . "\n";
+			$this->hidden_fields[] = $ret;
 		else
 			return $ret;
 	}
+	
+	/*
+	Flush hidden fields buffer.
+	*/
+	function output_hidden()
+	{
+		// TODO: Should this be a class member? CP 2015-08
+		global $hidden_fields;
+	
+		if (is_array($hidden_fields))
+			echo implode('', $hidden_fields);
+		$hidden_fields = array();
+	}
+
 	/*
 	 * Universal submit form button. $atype - type of submit: Normal submit: false - normal button; optional icon null -
 	 * button visible only in fallback mode; optional icon Ajax submit: true	 - standard button; optional icon 'default'

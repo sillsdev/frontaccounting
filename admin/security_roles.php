@@ -85,14 +85,14 @@ if (get_post('addupdate'))
 		$sections = array();
 		$areas = array();
 		foreach($_POST as $p =>$val) {
-			if (substr($p,0,4) == 'Area') {
+			if (substr($p,0,4) == 'Area' && $val == 1) {
 				$a = substr($p, 4);
 				if (($a&~0xffff) && (($a&0xff00)<(99<<8))) {
 					$sections[] = $a&~0xff;	// add extended section for plugins
 				}
 				$areas[] = (int)$a;
 			}
-			if (substr($p,0,7) == 'Section')
+			if (substr($p,0,7) == 'Section' && $val == 1)
 				$sections[] = (int)substr($p, 7);
 		}
 //		$areas = sort_areas($areas);
@@ -196,7 +196,7 @@ start_table(TABLESTYLE2);
 	record_status_list_row(_("Current status:"), 'inactive');
 end_table(1);
 
-	start_table(TABLESTYLE, "width=40%");
+	start_table(TABLESTYLE, "width='40%'");
 
 	$k = $j = 0; //row colour counter
 	$ext = $sec = $m = -1;

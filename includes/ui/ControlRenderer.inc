@@ -1,15 +1,18 @@
 <?php
 
 /**********************************************************************
-    Copyright (C) FrontAccounting, LLC.
+	Copyright (C) FrontAccounting, LLC.
 	Released under the terms of the GNU General Public License, GPL,
 	as published by the Free Software Foundation, either version 3
 	of the License, or (at your option) any later version.
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the License here <http://www.gnu.org/licenses/gpl-3.0.html>.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+	See the License here <http://www.gnu.org/licenses/gpl-3.0.html>.
 ***********************************************************************/
+
+include_once('InputRenderer.inc');
+
 // ---------------------------------------------------------------------------------
 class ControlRenderer
 {
@@ -53,6 +56,11 @@ class ControlRenderer
 			echo "<form method='post' action='$action' $name>\n";
 	}
 
+	private function output_hidden()
+	{
+		InputRenderer::get()->output_hidden();
+	}
+
 	// ---------------------------------------------------------------------------------
 	function end_form($breaks = 0)
 	{
@@ -64,6 +72,8 @@ class ControlRenderer
 		hidden('_focus');
 		hidden('_modified', get_post('_modified', 0));
 		hidden('_token', $_SESSION['csrf_token']);
+	
+		$this->output_hidden();
 		echo "</form>\n";
 		$Ajax->activate('_token');
 	}
@@ -95,6 +105,7 @@ class ControlRenderer
 	function end_table($breaks = 0)
 	{
 		echo "</table></center>\n";
+		$this->output_hidden();
 		if ($breaks)
 			br($breaks);
 	}
@@ -109,9 +120,12 @@ class ControlRenderer
 
 	function table_section($number = 1, $width = false)
 	{
-		if ($number > 1) {
+		if ($number > 1)
+		{
 			echo "</table>\n";
 			$width = ($width ? "width=$width" : "");
+			$this->output_hidden();
+			$width = ($width ? "width='$width'" : "");
 			// echo "</td><td class='tableseparator' $width>\n"; // outer table
 			echo "</td><td style='border-left:1px solid #cccccc;' $width>\n"; // outer table
 		}
@@ -121,7 +135,10 @@ class ControlRenderer
 	function end_outer_table($breaks = 0, $close_table = true)
 	{
 		if ($close_table)
+		{
 			echo "</table>\n";
+			$this->output_hidden();
+		}
 		echo "</td></tr>\n";
 		end_table($breaks);
 	}
@@ -156,7 +173,8 @@ class ControlRenderer
 		$access = '';
 		$slices = array();
 
-		if (preg_match('/(.*)&([a-zA-Z0-9])(.*)/', $label, $slices)) {
+		if (preg_match('/(.*)&([a-zA-Z0-9])(.*)/', $label, $slices))
+		{
 			$label = $clean ? $slices[1] . $slices[2] . $slices[3] : $slices[1] . '<u>' . $slices[2] . '</u>' . $slices[3];
 			$access = " accesskey='" . strtoupper($slices[2]) . "'";
 		}
@@ -176,7 +194,8 @@ class ControlRenderer
 		if ($center)
 			echo "<center>";
 		$id = 0;
-		if ($no_menu && $trans_no != 0) {
+		if ($no_menu && $trans_no != 0)
+		{
 			include_once ($path_to_root . "/admin/db/attachments_db.inc");
 			$id = has_attachment($type_no, $trans_no);
 			$attach = get_attachment_string($type_no, $trans_no);
@@ -185,7 +204,8 @@ class ControlRenderer
 		$width = ($id != 0 ? "30%" : "20%");
 		start_table(false, "width=$width");
 		start_row();
-		if ($no_menu) {
+		if ($no_menu)
+		{
 			echo "<td align=center><a href='javascript:window.print();'>" . _("Print") . "</a></td>\n";
 		}
 		echo "<td align=center><a href='javascript:goBack(" . ($final ? '-2' : '') . ");'>" . ($no_menu ? _("Close") : _("Back")) . "</a></td>\n";
@@ -226,12 +246,14 @@ class ControlRenderer
 		if ($id != '')
 			$class = " id='$id'";
 
-		if ($url != "") {
+		if ($url != "")
+		{
 			$pars = access_string($label);
 			if (user_graphic_links() && $icon)
 				$pars[0] = set_icon($icon, $pars[0]);
 			$preview_str = "<a target='_blank' $class $id href='$path_to_root/$url' onclick=\"javascript:openWindow(this.href,this.target); return false;\"$pars[1]>$pars[0]</a>";
-		} else
+		}
+		else
 			$preview_str = $label;
 		return $preview_str;
 	}
@@ -306,10 +328,12 @@ class ControlRenderer
 		$classes = $extra_class ? array(
 			$extra_class
 		) : array();
-		if ($k == 1) {
+		if ($k == 1)
+		{
 			array_push($classes, 'oddrow');
 			$k = 0;
-		} else {
+		} else
+		{
 			array_push($classes, 'evenrow');
 			$k ++;
 		}
@@ -386,7 +410,9 @@ class ControlRenderer
 	{
 		global $Ajax;
 
-		if (count($this->ajax_divs)) {
+		$this->output_hidden();
+		if (count($this->ajax_divs))
+		{
 			$div = array_pop($this->ajax_divs);
 			if ($div[1] !== null)
 				$Ajax->addUpdate($div[1], $div[0], ob_get_flush());
