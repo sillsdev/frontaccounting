@@ -139,12 +139,9 @@ class InputRenderer
 	*/
 	function output_hidden()
 	{
-		// TODO: Should this be a class member? CP 2015-08
-		global $hidden_fields;
-	
-		if (is_array($hidden_fields))
-			echo implode('', $hidden_fields);
-		$hidden_fields = array();
+		if (is_array($this->hidden_fields))
+			echo implode('', $this->hidden_fields);
+		$this->hidden_fields = array();
 	}
 
 	/*
