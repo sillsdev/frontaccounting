@@ -174,7 +174,7 @@ function void_bank_trans($type, $type_no, $nested=false)
 function check_bank_account_history($delta_amount, $bank_account, $date = null, $balance_offset = 0)
 {
 	if ($delta_amount >= 0 && isset($date))
-		 return null;	// amount increese is always safe
+		 return null;	// amount increase is always safe
 
 	$balance = $date ? get_bank_account_limit($bank_account, $date) : 0;
 
