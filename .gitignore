@@ -17,6 +17,7 @@ vendor_bower/
 /lang
 /modules/*
 !/modules/tests/
+/modules/tests/wiki
 /themes/*
 !/themes/default
 !/themes/aqua
