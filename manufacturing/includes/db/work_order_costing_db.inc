@@ -23,7 +23,12 @@ function add_wo_costing($workorder_id, $cost_type, $trans_type, $trans_no, $fact
 
 function get_wo_costing($workorder_id)
 {
-	$sql="SELECT * FROM ".TB_PREF."wo_costing WHERE workorder_id=".db_escape($workorder_id);
+	$sql="SELECT * 
+		FROM ".TB_PREF."wo_costing cost,
+			".TB_PREF."journal gl
+		WHERE
+			cost.trans_type=gl.type AND cost.trans_no=gl.trans_no
+			AND workorder_id=".db_escape($workorder_id);
 
 	return db_query($sql, "could not get work order costing");
 }
@@ -139,7 +144,7 @@ function add_issue_cost($stock_id, $qty, $date_, $costs, $adj_only=false)
 				-$costs);
 			//GL Posting to inventory adjustment account
 			add_gl_trans_std_cost(ST_JOURNAL, $id, $date_, 
-				$stock_gl_code["assembly_account"],
+				$stock_gl_code["wip_account"],
 				$stock_gl_code['dimension_id'], $stock_gl_code['dimension2_id'], $memo,
 				$costs);
 				
@@ -164,7 +169,7 @@ function add_issue_cost($stock_id, $qty, $date_, $costs, $adj_only=false)
 /*
 	Create journal entry for WO related costs.
 */
-function add_wo_costs_journal($wo_id, $amount, $cost_type, $cr_acc, $db_acc, $date, $dim1=0, $dim2=0, $memo = null, $ref= null)
+function add_wo_costs_journal($wo_id, $amount, $cost_type, $cr_acc, $date, $dim1=0, $dim2=0, $memo = null, $ref= null)
 {
 //-------- this should be done by single call to write_journal_entries() using items_cart()
 //
@@ -174,32 +179,27 @@ function add_wo_costs_journal($wo_id, $amount, $cost_type, $cr_acc, $db_acc, $da
 
     $journal_id = get_next_trans_no(ST_JOURNAL);
 
+	$wo = get_work_order($wo_id);
+
     if (!$ref) $ref = $Refs->get_next(ST_JOURNAL, null, $date);
 
 	add_gl_trans_std_cost(ST_JOURNAL, $journal_id, $date, $cr_acc,
 		0, 0, $wo_cost_types[$cost_type], -$amount);
+
 	$is_bank_to = is_bank_account($cr_acc);
 	if ($is_bank_to)
 	{
 		add_bank_trans(ST_JOURNAL, $journal_id, $is_bank_to, "",
 			$date, -$amount, PT_WORKORDER, $wo_id, get_company_currency(),
 			"Cannot insert a destination bank transaction");
-	} 
+	}
 	add_journal(ST_JOURNAL, $journal_id, $amount, $date, get_company_currency(), $ref);
 
-	add_gl_trans_std_cost(ST_JOURNAL, $journal_id, $date, $db_acc,
+	add_gl_trans_std_cost(ST_JOURNAL, $journal_id, $date, $wo['wip_account'],
 		$dim1, $dim2,  $wo_cost_types[$cost_type], $amount);
 
-	$wip = get_company_pref('wip_act');
-
-	if ($db_acc != $wip)
-	{
-		add_gl_trans_std_cost(ST_JOURNAL, $journal_id, $date, $db_acc,
-			0, 0,  $wo_cost_types[$cost_type], -$amount);
-
-		add_gl_trans_std_cost(ST_JOURNAL, $journal_id, $date, $wip,
-			0, 0,  $wo_cost_types[$cost_type], $amount);
-	}
+	$wo = get_work_order($wo_id);
+	$wip = $wo['wip_account'];
 
 	$Refs->save(ST_JOURNAL, $journal_id, $ref);
 
@@ -232,7 +232,7 @@ function work_order_production_gl($woid, $stock_id, $quantity, $date_, $rcv_no)
 		if (!is_service($bom_item["mb_flag"]))
 			$ivaccount = $bom_item["inventory_account"];
 		else
-			$ivaccount = $bom_item["assembly_account"];
+			$ivaccount = $bom_item["cogs_account"];
 
 		$memo = $date_.": ".$bom_item["units_req"] ." * ".$bom_item["description"];
 
@@ -240,7 +240,8 @@ function work_order_production_gl($woid, $stock_id, $quantity, $date_, $rcv_no)
 			$memo, -$bom_item["ComponentCost"] * $bom_item["units_req"] * $quantity);
 	}
 
-    add_gl_trans_std_cost(ST_MANURECEIVE, $rcv_no, $date_, get_company_pref('wip_act'),
+	$wo = get_work_order($woid);
+    add_gl_trans_std_cost(ST_MANURECEIVE, $rcv_no, $date_, $wo['wip_account'],
         0, 0, $memo, -$total_cost);
 }
 

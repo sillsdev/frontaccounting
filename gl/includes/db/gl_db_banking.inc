@@ -298,8 +298,7 @@ function add_bank_transfer($from_account, $to_account, $date_,
 	return $trans_no;
 }
 
-function check_bank_transfer(
-    $trans_no, $from_account, $to_account, $date_,
+function check_bank_transfer($trans_no, $from_account, $to_account, $date_,
     $amount, $target_amount=0)
 {
 	$dbResult = get_bank_trans(ST_BANKTRANSFER, $trans_no);
@@ -325,7 +324,7 @@ function check_bank_transfer(
 				$problemTransaction = null;
 			}
 		}
-		if (null != $problemTransaction) {
+		if ($problemTransaction != null) {
 			$problemTransaction['account'] = $old_to['bank_act'];
 			$problemTransaction['bank_account_name'] = $old_to['bank_account_name'];
 			return $problemTransaction;
@@ -342,7 +341,7 @@ function check_bank_transfer(
 		$balance_offset = -$old_from['amount'];
 	}
 	$problemTransaction = check_bank_account_history(-$amount, $from_account, $date_, null, $balance_offset);
-	if (null != $problemTransaction) {
+	if ($problemTransaction != null) {
 		$problemTransaction['account'] = $old_from['bank_act'];
 		$problemTransaction['bank_account_name'] = $old_from['bank_account_name'];
 		return $problemTransaction;
