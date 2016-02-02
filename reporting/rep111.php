@@ -68,6 +68,9 @@ function print_sales_quotations()
 	for ($i = $from; $i <= $to; $i++)
 	{
 		$myrow = get_sales_order_header($i, ST_SALESQUOTE);
+		if ($currency != ALL_TEXT && $myrow['curr_code'] != $currency) {
+			continue;
+		}
 		$baccount = get_default_bank_account($myrow['curr_code']);
 		$params['bankaccount'] = $baccount['id'];
 		$branch = get_branch($myrow["branch_code"]);
@@ -144,7 +147,6 @@ function print_sales_quotations()
 			$rep->TextColLines(1, 5, $myrow['comments'], -2);
 		}
 		$DisplaySubTot = number_format2($SubTotal,$dec);
-		$DisplayFreight = number_format2($myrow["freight_cost"],$dec);
 
 		$rep->row = $rep->bottomMargin + (15 * $rep->lineHeight);
 		$doctype = ST_SALESQUOTE;
@@ -152,10 +154,13 @@ function print_sales_quotations()
 		$rep->TextCol(3, 6, _("Sub-total"), -2);
 		$rep->TextCol(6, 7,	$DisplaySubTot, -2);
 		$rep->NewLine();
-		$rep->TextCol(3, 6, _("Shipping"), -2);
-		$rep->TextCol(6, 7,	$DisplayFreight, -2);
-		$rep->NewLine();
-
+		if ($myrow['freight_cost'] != 0.0)
+		{
+			$DisplayFreight = number_format2($myrow["freight_cost"],$dec);
+			$rep->TextCol(3, 6, _("Shipping"), -2);
+			$rep->TextCol(6, 7,	$DisplayFreight, -2);
+			$rep->NewLine();
+		}
 		$DisplayTotal = number_format2($myrow["freight_cost"] + $SubTotal, $dec);
 		if ($myrow['tax_included'] == 0) {
 			$rep->TextCol(3, 6, _("TOTAL ORDER EX VAT"), - 2);

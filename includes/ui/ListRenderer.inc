@@ -375,7 +375,6 @@ class ListRenderer
 
 		if ($first_id !== false) {
 			$sel = ($found === $first_id) || ($found === false && ($spec_option === false)) ? "selected='selected'" : '';
-			$selector = sprintf($first_opt, $sel) . $selector;
 		}
 		// Prepend special option.
 		if ($spec_option !== false) { // if special option used - add it

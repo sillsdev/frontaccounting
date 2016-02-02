@@ -41,7 +41,7 @@ if (isset($_SESSION['View']))
 
 $_SESSION['View'] = new Cart($_GET['trans_type'], $_GET['trans_no']);
 
-start_table(TABLESTYLE2, "width=95%", 5);
+start_table(TABLESTYLE2, "width='95%'", 5);
 
 if ($_GET['trans_type'] != ST_SALESQUOTE)
 {
@@ -56,7 +56,7 @@ if ($_GET['trans_type'] != ST_SALESQUOTE)
 
 echo "<tr valign=top><td>";
 
-start_table(TABLESTYLE, "width=95%");
+start_table(TABLESTYLE, "width='95%'");
 label_row(_("Customer Name"), $_SESSION['View']->customer_name, "class='tableheader2'",
 	"colspan=3");
 start_row();
@@ -197,7 +197,7 @@ if ($_SESSION['View']->so_type == 1)
 	display_note(_("This Sales Order is used as a Template."), 0, 0, "class='currentfg'");
 display_heading2(_("Line Details"));
 
-start_table(TABLESTYLE, "colspan=9 width=95%");
+start_table(TABLESTYLE, "width='95%'");
 $th = array(_("Item Code"), _("Item Description"), _("Quantity"), _("Unit"),
 	_("Price"), _("Discount"), _("Total"), _("Quantity Delivered"));
 table_header($th);
@@ -224,8 +224,9 @@ foreach ($_SESSION['View']->line_items as $stock_item) {
 	end_row();
 }
 
-label_row(_("Shipping"), price_format($_SESSION['View']->freight_cost),
-	"align=right colspan=6", "nowrap align=right", 1);
+if ($_SESSION['View']->freight_cost != 0.0)
+	label_row(_("Shipping"), price_format($_SESSION['View']->freight_cost),
+		"align=right colspan=6", "nowrap align=right", 1);
 
 $sub_tot = $_SESSION['View']->get_items_total() + $_SESSION['View']->freight_cost;
 

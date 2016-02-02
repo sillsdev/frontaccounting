@@ -40,9 +40,25 @@ function help_url($context=null)
 	if ($clean)
 		$help_page_url = access_string($help_page_url, true);
 
-	return $help_base_url
+	return htmlspecialchars($help_base_url
 		.urlencode(strtr(ucwords($help_page_url), array(' '=>'', '/'=>'', '&'=>'And')))
-		.'&ctxhelp=1&lang='.$country;
+		.'&ctxhelp=1&lang='.$country);
+}
+
+function send_css($css = '')
+{
+	global $css_files;
+
+	css_files_ensure_init();
+
+	foreach ($css_files as $css_file)
+	{
+		echo "<link href='$css_file' rel='stylesheet' type='text/css'> \n";
+	}
+	if ($css)
+	{
+		echo "<link href='$css' rel='stylesheet' type='text/css'> \n";
+	}
 }
 
 function send_scripts()
@@ -121,16 +137,17 @@ function page_header($title, $no_menu=false, $is_index=false, $onload="", $js=""
 	$encoding = $_SESSION['language']->encoding;
 
 	if (!headers_sent()){
-		header("Content-type: text/html; charset='$encoding'");
+		header("Content-type: text/html; charset=$encoding");
 	}
 	echo "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">\n";
 	echo "<html dir='" . $_SESSION['language']->dir . "' >\n";
 	echo "<head profile=\"http://www.w3.org/2005/10/profile\"><title>$title</title>";
+	if (strpos($_SERVER['HTTP_USER_AGENT'], 'Trident/7.0; rv:11.0') != -1) // IE 11 doesn't work with input file type in form.
+		echo "<meta http-equiv='X-UA-Compatible' content='IE=10'>\n";
 	echo "<meta http-equiv='Content-type' content='text/html; charset=$encoding'>";
-	echo "<link href='$path_to_root/themes/$theme/default.css' rel='stylesheet' type='text/css'> \n";
- 	echo "<link href='$path_to_root/themes/default/images/favicon.ico' rel='icon' type='image/x-icon'> \n";
-	if ($css)
-		echo '<link href="'.$css.'" rel="stylesheet" type="text/css">';
+	echo "<link href='$path_to_root/themes/default/images/favicon.ico' rel='icon' type='image/x-icon'> \n";
+
+	send_css($css);
 
 	send_scripts();
 

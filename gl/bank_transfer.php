@@ -189,12 +189,13 @@ function check_valid_entries($trans_no)
 		))) {
 			if (!array_key_exists('trans_no', $problemTransaction)) {
 				display_error(sprintf(
-					_("This bank transfer would result in exceeding authorized overdraft limit of the account (%s)"),
-					price_format(-$problemTransaction['amount'])
+					_("This bank transfer edit would result in a balance (%s) exceeding the limit of the account '%s'"),
+					price_format(-$problemTransaction['amount']), $problemTransaction['bank_account_name']
 				));
 			} else {
 				display_error(sprintf(
-					_("This bank transfer would result in exceeding authorized overdraft limit for transaction: %s #%s on %s."),
+					_("This bank transfer edit would result in a balance (%s) exceeding the limit of the account '%s' for transaction: %s #%s on %s."),
+					price_format(-$problemTransaction['amount']), $problemTransaction['bank_account_name'], 
 					$systypes_array[$problemTransaction['type']], $problemTransaction['trans_no'], sql2date($problemTransaction['trans_date'])
 				));
 			}
@@ -205,12 +206,13 @@ function check_valid_entries($trans_no)
 		if (null != ($problemTransaction = check_bank_account_history(-$amnt_tr, $_POST['FromBankAccount'], $_POST['DatePaid']))) {
 			if (!array_key_exists('trans_no', $problemTransaction)) {
 				display_error(sprintf(
-					_("This bank transfer would result in exceeding authorized overdraft limit of the account (%s)"),
+					_("This bank transfer would result in a balance (%s) exceeding the limit of the account"),
 					price_format(-$problemTransaction['amount'])
 				));
 			} else {
 				display_error(sprintf(
-					_("This bank transfer would result in exceeding authorized overdraft limit for transaction: %s #%s on %s."),
+					_("This bank transfer would result in a balance (%s) exceeding the limit of the account '%s' for transaction: %s #%s on %s."),
+					price_format(-$problemTransaction['amount']), $problemTransaction['bank_account_name'],
 					$systypes_array[$problemTransaction['type']], $problemTransaction['trans_no'], sql2date($problemTransaction['trans_date'])
 				));
 			}

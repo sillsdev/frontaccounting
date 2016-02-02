@@ -221,6 +221,8 @@ function check_bank_transfer(
 			}
 		}
 		if (null != $problemTransaction) {
+			$problemTransaction['account'] = $toAccount['bank_act'];
+			$problemTransaction['bank_account_name'] = $toAccount['bank_account_name'];
 			return $problemTransaction;
 		}
 	}
@@ -234,7 +236,11 @@ function check_bank_transfer(
 		$balance_offset = -$fromAccount['amount'];
 	}
 	$problemTransaction = check_bank_account_history(-$amount, $from_account, sql2date($fromAccount['trans_date']), $balance_offset);
-
+	if (null != $problemTransaction) {
+		$problemTransaction['account'] = $fromAccount['bank_act'];
+		$problemTransaction['bank_account_name'] = $fromAccount['bank_account_name'];
+		return $problemTransaction;
+	}
 	// 4) The edited to account, that is having funds added which is always ok.
 
 	return $problemTransaction;

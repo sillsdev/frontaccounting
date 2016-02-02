@@ -152,9 +152,9 @@ function work_order_quick_costs($woid, $stock_id, $units_reqd, $date_, $advanced
 	if ($advanced)
 	{
 		//Chaitanya: Material cost added at time of production as per BOM at the time and in adjustment mode.
-		add_material_cost($stock_id, $units_reqd, $date_, true);	
+		add_material_cost($stock_id, $units_reqd, $date_, true, $woid);	
 	
-		$wo = get_work_order($woid);
+		// $wo = get_work_order($woid);
 		// also take the additional issues
 		// moved to work_order_issues_db.inc
 		/*
@@ -224,8 +224,11 @@ function work_order_quick_costs($woid, $stock_id, $units_reqd, $date_, $advanced
         0, 0, $memo, -$total_cost);	
 		
 	//Chaitanya : Update cost of the manufactured item in stock moves table
-	$UnitWOCost = ($total_material_cost + $costs + $labour)/$units_reqd;
-	update_stock_move(ST_WORKORDER, $woid, $stock_id, $UnitWOCost);		
+	if (!$advanced)
+	{
+		$UnitWOCost = ($total_material_cost + $costs + $labour)/$units_reqd;
+		update_stock_move(ST_WORKORDER, $woid, $stock_id, $UnitWOCost);	
+	}	
 }
 
 //--------------------------------------------------------------------------------------

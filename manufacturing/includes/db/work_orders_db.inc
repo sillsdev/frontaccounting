@@ -11,7 +11,7 @@
 ***********************************************************************/
 //--------------------------------------------------------------------------------------
 
-function add_material_cost($stock_id, $qty, $date_, $advanced=false)
+function add_material_cost($stock_id, $qty, $date_, $advanced=false, $woid=0)
 {
 	$m_cost = 0;
     $result = get_bom($stock_id);
@@ -21,19 +21,31 @@ function add_material_cost($stock_id, $qty, $date_, $advanced=false)
 		$m_cost += ($bom_item['quantity'] * $standard_cost);
 	}
 	$bom_cost = $m_cost;
-	
+	// new Joe Hunt 2015.10.15	
+	// additilnal costs.
+	$i_cost = 0;
+	if ($woid != 0 && work_order_has_issues($woid))
+	{
+		$res = get_additional_issues($woid);
+		while ($issue = db_fetch($res))
+		{
+			$standard_cost = get_standard_cost($issue['stock_id']);
+			$i_cost += ($issue['qty_issued'] * $standard_cost) / $qty;
+		}
+	}
 	$sql = "SELECT material_cost, labour_cost, overhead_cost FROM ".TB_PREF."stock_master WHERE stock_id = "
 		.db_escape($stock_id);
 	$result = db_query($sql);
 	$myrow = db_fetch($result);
-	$material_cost =  $myrow['material_cost'];
-	
+	$material_cost =  $myrow['material_cost'] - $i_cost; // $i_cost was already added to material cost
+	$m_cost += $i_cost;
+	/* no, why will we do that?? Joe Hunt 2015.10.17
 	if ($advanced)
 	{
 		//reduce overhead_cost and labour_cost from price as those will remain as is
 		$m_cost = $m_cost - $myrow['labour_cost'] - $myrow['overhead_cost'];
 	}
-	
+	*/
 	$qoh = get_qoh_on_date($stock_id);
 	$cost_adjust = false;
 	if ($qoh < 0)
@@ -45,7 +57,7 @@ function add_material_cost($stock_id, $qty, $date_, $advanced=false)
 	if ($qoh + $qty != 0)
 	{
 		if ($qoh == 0) // 27.10.2014 apmuthu and dz.
-			$material_cost += $m_cost;
+			$material_cost = $m_cost;
 		else	
 			$material_cost = ($qoh * $material_cost + $qty * $m_cost) /	($qoh + $qty);
 	}
@@ -71,10 +83,13 @@ function add_overhead_cost($stock_id, $qty, $date_, $costs, $adj_only=false)
 		$qoh = 0;
 	if ($adj_only)
 	{
-		if ($qty != 0)
-			$costs = $qty * $costs;
 		if ($qoh>0)
-			$overhead_cost = ($qoh * $overhead_cost + $costs) / $qoh;
+		{
+			if ($qoh + $qty != 0)	
+				$overhead_cost = ($qoh * $overhead_cost + $qty * $costs) /	($qoh + $qty);
+			elseif ($qty == 0)
+				$overhead_cost = ($qoh * $overhead_cost + $costs) / $qoh;
+		}			
 		else // Journal Entry if QOH is 0/negative 
 		{
 			global $Refs;
@@ -91,7 +106,7 @@ function add_overhead_cost($stock_id, $qty, $date_, $costs, $adj_only=false)
 				-$costs);
 			//GL Posting to inventory adjustment account
 			add_gl_trans_std_cost(ST_JOURNAL, $id, $date_, 
-				$stock_gl_code["adjustment_account"],
+				$stock_gl_code["assembly_account"],
 				$stock_gl_code['dimension_id'], $stock_gl_code['dimension2_id'], $memo,
 				$costs);
 				
@@ -126,10 +141,13 @@ function add_labour_cost($stock_id, $qty, $date_, $costs, $adj_only=false)
 		$qoh = 0;
 	if ($adj_only)
 	{
-		if ($qty != 0)
-			$costs = $qty * $costs;
 		if ($qoh>0)
-			$labour_cost = ($qoh * $labour_cost + $costs) / $qoh;	
+		{
+			if ($qoh + $qty != 0)	
+				$labour_cost = ($qoh * $labour_cost + $qty * $costs) /	($qoh + $qty);
+			elseif ($qty == 0)
+				$labour_cost = ($qoh * $labour_cost + $costs) / $qoh;
+		}		
 		else // Journal Entry if QOH is 0/negative 
 		{
 			global $Refs;
@@ -146,7 +164,7 @@ function add_labour_cost($stock_id, $qty, $date_, $costs, $adj_only=false)
 				-$costs);
 			//GL Posting to inventory adjustment account
 			add_gl_trans_std_cost(ST_JOURNAL, $id, $date_, 
-				$stock_gl_code["adjustment_account"],
+				$stock_gl_code["assembly_account"],
 				$stock_gl_code['dimension_id'], $stock_gl_code['dimension2_id'], $memo,
 				$costs);
 				
@@ -181,10 +199,8 @@ function add_issue_cost($stock_id, $qty, $date_, $costs, $adj_only=false)
 		$qoh = 0;
 	if ($adj_only)
 	{
-		if ($qty != 0)
-			$costs = $qty * $costs;
 		if ($qoh>0)
-			$material_cost = $costs / $qoh;
+			$material_cost = ($qoh * $material_cost + $costs) / $qoh;
 		else // Journal Entry if QOH is 0/negative
 		{
 			global $Refs;
@@ -201,7 +217,7 @@ function add_issue_cost($stock_id, $qty, $date_, $costs, $adj_only=false)
 				-$costs);
 			//GL Posting to inventory adjustment account
 			add_gl_trans_std_cost(ST_JOURNAL, $id, $date_, 
-				$stock_gl_code["adjustment_account"],
+				$stock_gl_code["assembly_account"],
 				$stock_gl_code['dimension_id'], $stock_gl_code['dimension2_id'], $memo,
 				$costs);
 				
@@ -215,9 +231,9 @@ function add_issue_cost($stock_id, $qty, $date_, $costs, $adj_only=false)
 	else
 	{
 		if ($qoh + $qty != 0)	
-			$material_cost = ($qty * $costs) /	($qoh + $qty);
+			$material_cost = ($qoh * $material_cost + $qty * $costs) /	($qoh + $qty);
 	}	
-	$sql = "UPDATE ".TB_PREF."stock_master SET material_cost=material_cost+"
+	$sql = "UPDATE ".TB_PREF."stock_master SET material_cost="
 		.db_escape($material_cost)
 		." WHERE stock_id=".db_escape($stock_id);
 	db_query($sql,"The cost details for the inventory item could not be updated");
@@ -443,7 +459,6 @@ function void_work_order($woid)
 		$date = sql2date($work_order['date_']);
 		
 		$result = get_work_order_productions($woid); // check the produced quantity
-		$qty = 0;
 		while ($row = db_fetch($result))
 		{
 			void_work_order_produce($row['id']);
@@ -459,7 +474,6 @@ function void_work_order($woid)
 
 		$result = get_work_order_issues($woid);
 		$cost = 0;
-		$issue_no = 0;
 		while ($row = db_fetch($result))
 		{
 			void_work_order_issue($row['issue_no']);
@@ -534,6 +548,11 @@ function get_sql_for_work_orders($outstanding_only, $all_items)
 		$sql .= " AND workorder.loc_code=".db_escape($_POST['StockLocation']);
 	}
 
+	if (isset($_POST['OrderId']) && $_POST['OrderId'] != "")
+	{
+		$sql .= " AND workorder.id LIKE ".db_escape('%'.$_POST['OrderId'].'%');
+	}
+
 	if (isset($_POST['OrderNumber']) && $_POST['OrderNumber'] != "")
 	{
 		$sql .= " AND workorder.wo_ref LIKE ".db_escape('%'.$_POST['OrderNumber'].'%');
@@ -550,6 +569,7 @@ function get_sql_for_work_orders($outstanding_only, $all_items)
 
 		$sql .= " AND workorder.required_by < '$Today' ";
 	}
+	$sql .= " ORDER BY workorder.id DESC";
 	return $sql;
 }
 
