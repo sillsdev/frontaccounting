@@ -1,3 +1,4 @@
+
 var gulp = require('gulp');
 var gutil = require('gulp-util');
 var child_process = require('child_process');
@@ -65,7 +66,7 @@ gulp.task('package-zip', function(cb) {
   var options = {
     dryRun: false,
     silent: false,
-    src: "./htdocs",
+    src: "./",
     name: "frontaccounting",
     version: "2.3.24",
     release: "-bootstrap.theme.2"
@@ -81,7 +82,7 @@ gulp.task('package-tar', function(cb) {
   var options = {
     dryRun: false,
     silent: false,
-    src: "./htdocs",
+    src: "./",
     name: "frontaccounting",
     version: "2.3.24",
     release: "-bootstrap.theme.2"
@@ -99,7 +100,7 @@ gulp.task('upload', function(cb) {
   var options = {
     dryRun: false,
     silent : false,
-    src : "htdocs",
+    src : "./",
     dest : "root@saygoweb.com:/var/www/virtual/saygoweb.com/bms/htdocs/"
   };
   execute(
@@ -113,7 +114,7 @@ gulp.task('upload-demo', function(cb) {
   var options = {
     dryRun: false,
     silent : false,
-    src : "htdocs",
+    src : "./",
     dest : "root@saygoweb.com:/var/www/virtual/saygoweb.com/demo/htdocs/frontaccounting/",
     key : ""
   };
