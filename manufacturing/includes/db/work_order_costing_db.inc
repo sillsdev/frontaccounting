@@ -93,7 +93,7 @@ function update_material_cost($stock_id, $qty, $unit_cost, $date)
 		if (!is_date_in_fiscalyear($cart->tran_date))
 			$cart->tran_date = end_fiscalyear();
 
-		$cart->reference = $Refs->get_next(ST_COSTUPDATE, null, $cart->tran_date, $date);
+		$cart->reference = $Refs->get_next(ST_COSTUPDATE, null, $cart->tran_date);
 
 		$cart->memo_ = sprintf(_("COGS changed from %s to %s for %d %s of '%s'"), $avg_cost, $unit_cost, $qty_delayed, $item['units'], $stock_id);
 
@@ -108,61 +108,6 @@ function update_material_cost($stock_id, $qty, $unit_cost, $date)
 
 	$sql = "UPDATE ".TB_PREF."stock_master SET material_cost=".db_escape($avg_cost)."
 		    WHERE stock_id=".db_escape($stock_id);
-	db_query($sql,"The cost details for the inventory item could not be updated");
-}
-
-function add_issue_cost($stock_id, $qty, $date_, $costs, $adj_only=false)
-{
-	if ($qty != 0)
-		$costs /= $qty;
-	$sql = "SELECT material_cost FROM ".TB_PREF."stock_master WHERE stock_id = "
-		.db_escape($stock_id);
-	$result = db_query($sql);
-	$myrow = db_fetch($result);
-	$material_cost =  $myrow['material_cost'];
-	$qoh = get_qoh_on_date($stock_id);
-	if ($qoh < 0)
-		$qoh = 0;
-	if ($adj_only)
-	{
-		if ($qoh>0)
-			$material_cost = ($qoh * $material_cost + $costs) / $qoh;
-		else // Journal Entry if QOH is 0/negative
-		{
-			global $Refs;
-
-			$id = get_next_trans_no(ST_JOURNAL);
-			$ref = $Refs->get_next(ST_JOURNAL, null, $date_);
-			add_journal(ST_JOURNAL, $id, $costs, $date_, get_company_currency(), $ref);
-			
-			$stock_gl_code = get_stock_gl_code($stock_id);
-			$memo = "WO Issue settlement JV for zero/negative respository of ".$stock_id;
-			//Reverse the inventory effect if $qoh <=0
-			add_gl_trans_std_cost(ST_JOURNAL, $id, $date_, 
-				$stock_gl_code["inventory_account"],
-				$stock_gl_code['dimension_id'], $stock_gl_code['dimension2_id'], $memo, 
-				-$costs);
-			//GL Posting to inventory adjustment account
-			add_gl_trans_std_cost(ST_JOURNAL, $id, $date_, 
-				$stock_gl_code["wip_account"],
-				$stock_gl_code['dimension_id'], $stock_gl_code['dimension2_id'], $memo,
-				$costs);
-				
-			add_audit_trail(ST_JOURNAL, $id, $date_);
-			add_comments(ST_JOURNAL, $id, $date_, $memo);
-			$Refs->save(ST_JOURNAL, $id, $ref);	
-			if ($qty != 0)
-			 	$material_cost = $costs / $qty; 
-		}
-	}
-	else
-	{
-		if ($qoh + $qty != 0)	
-			$material_cost = ($qoh * $material_cost + $qty * $costs) /	($qoh + $qty);
-	}	
-	$sql = "UPDATE ".TB_PREF."stock_master SET material_cost=material_cost+"
-		.db_escape($material_cost)
-		." WHERE stock_id=".db_escape($stock_id);
 	db_query($sql,"The cost details for the inventory item could not be updated");
 }
 
@@ -193,7 +138,7 @@ function add_wo_costs_journal($wo_id, $amount, $cost_type, $cr_acc, $date, $dim1
 			$date, -$amount, PT_WORKORDER, $wo_id, get_company_currency(),
 			"Cannot insert a destination bank transaction");
 	}
-	add_journal(ST_JOURNAL, $journal_id, $amount, $date, get_company_currency(), $ref);
+	add_journal(ST_JOURNAL, $journal_id, $amount, $date, get_company_currency(), $ref, '', 1, $date, $date);
 
 	add_gl_trans_std_cost(ST_JOURNAL, $journal_id, $date, $wo['wip_account'],
 		$dim1, $dim2,  $wo_cost_types[$cost_type], $amount);
@@ -245,14 +190,35 @@ function work_order_production_gl($woid, $stock_id, $quantity, $date_, $rcv_no)
         0, 0, $memo, -$total_cost);
 }
 
+function check_wo_costing($type, $trans_no)
+{
+	$sql = "SELECT workorder_id FROM ".TB_PREF."wo_costing WHERE trans_type= ".db_escape($type)." AND trans_no=".db_escape($trans_no);
+	$costs = db_query($sql, 'cannot check WO costing');
+
+	if (!db_num_rows($costs))
+		return 0;
+
+	$wo = db_fetch($costs);
+	return $wo['workorder_id'];
+}
+
 function void_wo_costing($wo_id)
 {
+	global $Refs;
+
 	$res = get_wo_costing($wo_id);
 
 	while($row = db_fetch($res))
 	{
 		// void any related gl trans
-		void_gl_trans($row['trans_type'], $row['trans_no'], true);
+		$date = Today();
+		$type = $row['trans_type'];
+		$trans_no = $row['trans_no'];
+		$memo = sprintf(_("Voided WO #%s"), $wo_id);
+		void_gl_trans($type, $trans_no, true);
+		add_audit_trail($type, $trans_no, $date, $memo);
+		add_voided_entry($type, $trans_no, $date, $memo);
+		$Refs->restore_last($type, $trans_no);
 	}
 
 	$sql = "DELETE FROM ".TB_PREF."wo_costing WHERE workorder_id=".db_escape($wo_id);
