@@ -37,19 +37,18 @@ describe('bank transfer page:', function () {
     pageReadBack.search(reference, 'Funds Transfer', '1/2/2013', '1/2/2013', null);
     var items = pageReadBack.getResultRow(0);
     items.then(function(actualItems) {
-      trans_no = parseInt(actualItems[3].text, 10);
+      trans_no = parseInt(actualItems[2].text, 10);
       expect(items).toEqual([
-        {column: 0, text: '-'},
-        {column: 1, text: '01/02/2013'},
-        {column: 2, text: 'Funds Transfer'},
-        {column: 3, text: trans_no.toString()},
-        {column: 4, text: ''},
-        {column: 5, text: reference},
-        {column: 6, text: '70.00'},
-        {column: 7, text: 'Some memo'},
-        {column: 8, text: 'test'},
-        {column: 9, text: ''},
-        {column: 10, text: ''}
+        {column: 0, text: '01/02/2013'},
+        {column: 1, text: 'Funds Transfer'},
+        {column: 2, text: trans_no.toString()},
+        {column: 3, text: ''},
+        {column: 4, text: reference},
+        {column: 5, text: '70.00'},
+        {column: 6, text: 'Some memo'},
+        {column: 7, text: 'test'},
+        {column: 8, text: ''},
+        {column: 9, text: ''}
       ]);
     });
   });
@@ -72,17 +71,16 @@ describe('bank transfer page:', function () {
     pageReadBack.search(reference, 'Funds Transfer', '1/2/2013', '1/2/2013', null);
     var items = pageReadBack.getResultRow(0);
     expect(items).toEqual([
-      {column: 0, text: '-'},
-      {column: 1, text: '01/02/2013'},
-      {column: 2, text: 'Funds Transfer'},
-      {column: 3, text: (trans_no + 1).toString()},
-      {column: 4, text: ''},
-      {column: 5, text: reference},
-      {column: 6, text: '60.00'},
-      {column: 7, text: 'Some other memo'},
-      {column: 8, text: 'test'},
-      {column: 9, text: ''},
-      {column: 10, text: ''}
+      {column: 0, text: '01/02/2013'},
+      {column: 1, text: 'Funds Transfer'},
+      {column: 2, text: (trans_no + 1).toString()},
+      {column: 3, text: ''},
+      {column: 4, text: reference},
+      {column: 5, text: '60.00'},
+      {column: 6, text: 'Some other memo'},
+      {column: 7, text: 'test'},
+      {column: 8, text: ''},
+      {column: 9, text: ''}
     ]);
   });
   it('can be voided', function () {
