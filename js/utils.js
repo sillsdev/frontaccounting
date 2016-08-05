@@ -202,10 +202,11 @@ JsHttpRequest._request = function(trigger, form, tout, retry) {
 						q[name] = el;
 					else
 					{
-						if (el.type == 'checkbox' && el.checked == false) {
-							el.value = 0;
+						if (el.type == 'checkbox') {
+							q[name] = (el.checked == true);
+						} else {
+							q[name] = el.value;
 						}
-						q[name] = el.value;
 					}
 				}
 			}
