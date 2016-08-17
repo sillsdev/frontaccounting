@@ -17,12 +17,12 @@
 	global $SysPrefs;
 
 	$Addr1 = array(
-			'title' => _("Charge To"),
+			'title' => _("Billing Address"),
 			'name' => @$this->formData['br_name'] ? $this->formData['br_name'] : @$this->formData['DebtorName'],
 			'address' => @$this->formData['br_address'] ? $this->formData['br_address'] : @$this->formData['address']
 	);
 	$Addr2 = array(
-			'title' => _("Delivered To"),
+			'title' => _("Delivery Address"),
 			'name' => @$this->formData['deliver_to'],
 			'address' => @$this->formData['delivery_address']
 	);
@@ -113,8 +113,7 @@
 			break;
 
 		case ST_SALESINVOICE:
-			$this->title = $this->formData['prepaid']=='partial' ? _("PREPAYMENT INVOICE")
-				: ($this->formData['prepaid']=='final' ? _("FINAL INVOICE")  : _("INVOICE"));
+			$this->title = _("TAX INVOICE");
 			$this->formData['document_name'] =_("Invoice No.");
 			$this->formData['domicile'] = $this->company['domicile'];
 			$Footer[0] = _("Please quote Invoice no. when paying. All amounts stated in"). " - " . $this->formData['curr_code'];
