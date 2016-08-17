@@ -259,7 +259,7 @@ function label_row($label, $value, $params="", $params2="", $leftfill=0, $id='')
 
 function text_input($name, $value=null, $size='', $max='', $title='', $params='')
 {
-	InputRenderer::get()->text_input($name, $value, $size, $max, $title, $params);
+	return InputRenderer::get()->text_input($name, $value, $size, $max, $title, $params);
 }
 
 //-----------------------------------------------------------------------------------
