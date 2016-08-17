@@ -65,9 +65,9 @@ gulp.task('package-zip', function(cb) {
   var options = {
     dryRun: false,
     silent: false,
-    src: "./htdocs",
+    src: "./",
     name: "frontaccounting",
-    version: "2.3.24",
+    version: "2.4.RC1",
     release: "-bootstrap.theme.2"
   };
   execute(
@@ -81,9 +81,9 @@ gulp.task('package-tar', function(cb) {
   var options = {
     dryRun: false,
     silent: false,
-    src: "./htdocs",
+    src: "./",
     name: "frontaccounting",
-    version: "2.3.24",
+    version: "2.4.RC1",
     release: "-bootstrap.theme.2"
   };
   execute(
@@ -99,7 +99,7 @@ gulp.task('upload', function(cb) {
   var options = {
     dryRun: false,
     silent : false,
-    src : "htdocs",
+    src : ".",
     dest : "root@saygoweb.com:/var/www/virtual/saygoweb.com/bms/htdocs/"
   };
   execute(
@@ -130,11 +130,11 @@ gulp.task('upload-demo', function(cb) {
  */
 gulp.task('db-backup', function(cb) {
   var options = {
-    dryRun: true,
+    dryRun: false,
     silent : false,
     dest : "root@bms.saygoweb.com",
     key : "~/.ssh/dev_rsa",
-    password : process.env.password
+    password : process.env.password_db
   };
   execute(
     'mysqldump -u cambell --password=<%= password %> saygoweb_fa | gzip > backup/current.sql.gz',
@@ -149,7 +149,7 @@ gulp.task('db-restore', function(cb) {
     silent : false,
     dest : "root@bms.saygoweb.com",
     key : "~/.ssh/dev_rsa",
-    password : process.env.password
+    password : process.env.password_db
   };
   execute(
     'gunzip -c backup/current.sql.gz | mysql -u cambell --password=<%= password %> -D saygoweb_fa',
