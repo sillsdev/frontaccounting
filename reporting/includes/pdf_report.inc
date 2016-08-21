@@ -991,7 +991,8 @@ class FrontReport extends Cpdf
 							." <" . $contact['email'] . ">";
 						$msg = _("Dear") . " " . $contact['name'] . ",\n\n" 
 							. _("Our ") . " " . strtolower($subject) . _(" for hosted services for the year is attached.\n\n")
-							. _("You can pay online by internet banking (preferred), you can pay in person at any branch of the BNZ, or you can pay by posting a cheque to our office.\n\n");
+							. _("You can pay online by internet banking (preferred), you can pay in person at any branch of the BNZ, or you can pay by posting a cheque to our office.\n\n")
+							. sprintf(_("Comments or questions? Reply to %s.  We're happy to help.\n\n"), $this->company['email']);
 
 						if (isset($this->formData['payment_service']))
 						{
@@ -1008,7 +1009,7 @@ class FrontReport extends Cpdf
 						}
 
 						$msg .= _("Regards") . "\n";
-						$sender = $this->user . "\n" . $this->company['coy_name'] . "\n" . $this->company['postal_address'] . "\n" . $this->company['email'] . "\n" . $this->company['phone'];
+						$sender = $this->user . "\n---\n" . $this->company['coy_name'] . "\n" . $this->company['postal_address'] . "\n" . $this->company['email'] . "\n" . $this->company['phone'];
 						$mail->to($to); $try++;
 						$mail->subject($subject);
 						$mail->text($msg . $sender);
