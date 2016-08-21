@@ -991,7 +991,7 @@ class FrontReport extends Cpdf
 							." <" . $contact['email'] . ">";
 						$msg = _("Dear") . " " . $contact['name'] . ",\n\n" 
 							. _("Our ") . " " . strtolower($subject) . _(" for hosted services for the year is attached.\n\n")
-							. _("You can pay by internet banking (preferred), or you can pay directly at any branch of the BNZ.\n\n");
+							. _("You can pay online by internet banking (preferred), you can pay in person at any branch of the BNZ, or you can pay by posting a cheque to our office.\n\n");
 
 						if (isset($this->formData['payment_service']))
 						{

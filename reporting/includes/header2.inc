@@ -182,7 +182,7 @@
 		}
 		// Payment terms
 		$this->row -= (2 * $this->lineHeight);
-		$this->Font('italic');
+// 		$this->Font('italic');
 		$this->TextWrap($ccol, $this->row, $right-$ccol, $Payment_Terms);
 		$this->Font();
 
@@ -196,7 +196,7 @@
 		$this->Font();
 
 		// Footer
-		$this->Font('italic');
+// 		$this->Font('italic');
 		$this->row = $iline7 - $this->lineHeight - 6;
 
 		foreach ($Footer as $line => $txt)
