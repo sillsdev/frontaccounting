@@ -17,12 +17,12 @@
 	global $SysPrefs;
 
 	$Addr1 = array(
-			'title' => _("Charge To"),
+			'title' => _("Billing Address"),
 			'name' => @$this->formData['br_name'] ? $this->formData['br_name'] : @$this->formData['DebtorName'],
 			'address' => @$this->formData['br_address'] ? $this->formData['br_address'] : @$this->formData['address']
 	);
 	$Addr2 = array(
-			'title' => _("Delivered To"),
+			'title' => _("Delivery Address"),
 			'name' => @$this->formData['deliver_to'],
 			'address' => @$this->formData['delivery_address']
 	);
