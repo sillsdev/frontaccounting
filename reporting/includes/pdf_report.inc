@@ -987,10 +987,12 @@ class FrontReport extends Cpdf
     						$this->company['email']);
 						$mail->charset = $this->encoding;
 
-	    				$to = str_replace(",", "", $contact['name'].' '.$contact['name2'])
-	    					." <" . $contact['email'] . ">";
-    					$msg = _("Dear") . " " . $contact['name2'] . ",\n\n" 
-    						. _("Attached you will find ") . " " . $subject ."\n\n";
+						$to = str_replace(",", "", $contact['name'].' '.$contact['name2'])
+							." <" . $contact['email'] . ">";
+						$msg = _("Dear") . " " . $contact['name'] . ",\n\n" 
+							. _("Our ") . " " . strtolower($subject) . _(" for hosted services for the year is attached.\n\n")
+							. _("You can pay online by internet banking (preferred), you can pay in person at any branch of the BNZ, or you can pay by posting a cheque to our office.\n\n")
+							. sprintf(_("Comments or questions? Reply to %s.  We're happy to help.\n\n"), $this->company['email']);
 
 						if (isset($this->formData['payment_service']))
 						{
@@ -1006,14 +1008,14 @@ class FrontReport extends Cpdf
 								$msg.= _("You can pay through"). " $service: $url\n\n";
 						}
 
-	    				$msg .= _("Kindest regards") . "\n\n";
-    					$sender = $this->user . "\n" . $this->company['coy_name'] . "\n" . $this->company['postal_address'] . "\n" . $this->company['email'] . "\n" . $this->company['phone'];
-    					$mail->to($to); $try++;
-    					$mail->subject($subject);
-    					$mail->text($msg . $sender);
-    					$mail->attachment($fname, $this->filename);
-    					$emails .= " " . $contact['email'];
-    					if ($mail->send()) $sent++;
+						$msg .= _("Regards") . "\n";
+						$sender = $this->user . "\n---\n" . $this->company['coy_name'] . "\n" . $this->company['postal_address'] . "\n" . $this->company['email'] . "\n" . $this->company['phone'];
+						$mail->to($to); $try++;
+						$mail->subject($subject);
+						$mail->text($msg . $sender);
+						$mail->attachment($fname, $this->filename);
+						$emails .= " " . $contact['email'];
+						if ($mail->send()) $sent++;
 					} // foreach contact
 					unlink($fname);
 					$this->SetLang(user_language());

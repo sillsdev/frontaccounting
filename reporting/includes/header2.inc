@@ -74,7 +74,7 @@
 		if ($this->company['coy_logo'] != '' && file_exists($logo))
 		{
 // 			$this->AddImage($logo, $ccol, $this->row, 0, 20);
-			$this->AddImage($logo, $this->leftMargin - 5, $this->row, 0, 20);
+			$this->AddImage($logo, $this->leftMargin - 5, $this->row, 0, 35);
 		}
 		else
 		{

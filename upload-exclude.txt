@@ -9,7 +9,6 @@ composer.*
 package.json
 bower.json
 upload-exclude.txt
-sql/
 config_db.php
 config.php
 modules/api

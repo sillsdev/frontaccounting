@@ -100,25 +100,10 @@ gulp.task('upload', function(cb) {
     dryRun: false,
     silent : false,
     src : ".",
-    dest : "root@saygoweb.com:/var/www/virtual/saygoweb.com/bms/htdocs/"
+    dest : "root@bms.palaso.org:/var/www/virtual/bms.palaso.org/htdocs/"
   };
   execute(
-    'rsync -rzlt --chmod=Dug=rwx,Fug=rw,o-rwx --delete --exclude-from="upload-exclude.txt" --stats --rsync-path="sudo -u vu2006 rsync" --rsh="ssh" <%= src %>/ <%= dest %>',
-    options,
-    cb
-  );
-});
-
-gulp.task('upload-demo', function(cb) {
-  var options = {
-    dryRun: false,
-    silent : false,
-    src : "htdocs",
-    dest : "root@saygoweb.com:/var/www/virtual/saygoweb.com/demo/htdocs/frontaccounting/",
-    key : ""
-  };
-  execute(
-    'rsync -rzlt --chmod=Dug=rwx,Fug=rw,o-rwx --delete --exclude-from="upload-exclude.txt" --stats --rsync-path="sudo -u vu2006 rsync" --rsh="ssh" <%= src %>/ <%= dest %>',
+    'rsync -rzlt --chmod=Dug=rwx,Fug=rw,o-rwx --delete --exclude-from="upload-exclude.txt" --stats --rsync-path="sudo -u vu2032 rsync" --rsh="ssh" <%= src %>/ <%= dest %>',
     options,
     cb
   );
