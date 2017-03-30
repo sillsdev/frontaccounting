@@ -173,6 +173,22 @@ gulp.task('db-copy', function(cb) {
   );
 });
 
+gulp.task('db-backup-test', function(cb) {
+  execute(
+      'mysqldump -u travis fa_test | gzip > backup/fa_test_current.sql.gz',
+      null,
+      cb
+    );
+});
+
+gulp.task('db-restore-test', function(cb) {
+  execute(
+      'gunzip -c backup/fa_test_current.sql.gz | mysql -u travis -D fa_test',
+      null,
+      cb
+    );
+});
+
 gulp.task('env-files', function() {
   gulp.src('modules/tests/data/*.php')
     .pipe(gulp.dest('.'));
@@ -185,6 +201,14 @@ gulp.task('env-files', function() {
 gulp.task('env-db', function(cb) {
   execute(
       'gunzip -c modules/tests/data/fa_test.sql.gz | mysql -u travis -D fa_test',
+      null,
+      cb
+    );
+});
+
+gulp.task('env-db-demo', function(cb) {
+  execute(
+      'gunzip -c modules/tests/data/fa_demo.sql.gz | mysql -u travis -D fa_test',
       null,
       cb
     );
@@ -225,7 +249,7 @@ gulp.task('test-restore', function() {
 gulp.task('test-php', ['env-db'], function(cb) {
   var command = '/usr/bin/env php modules/tests/vendor/bin/phpunit -c modules/tests/phpunit.xml';
   execute(command, null, function(err) {
-    cb(null); // Swallow the error propagation so that gulp doesn't display a nodejs backtrace.
+    cb(err); // Propagate the error so that Travis fails on test error.
   });
 });
 

@@ -1,7 +1,9 @@
 node_modules/
 vendor/
 vendor_bower/
+/backup/
 /.settings/
+/.vscode/
 /company/*
 !/company/0
 /company/*/attachments
