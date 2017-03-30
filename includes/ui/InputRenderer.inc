@@ -384,9 +384,9 @@ class InputRenderer
 	// -----------------------------------------------------------------------------------
 	function check_value($name)
 	{
-		if (!isset($_POST[$name]) || $_POST[$name]=='')
-			return 0;
-		return 1;
+		if (isset($_POST[$name]) && $_POST[$name])
+			return 1;
+		return 0;
 	}
 
 	function checkbox($label, $name, $value = null, $submit_on_change = false, $title = false)

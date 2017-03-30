@@ -418,7 +418,28 @@ if (!function_exists('array_fill_keys')) // since 5.2
 {
 	function array_fill_keys($keys, $value)
 	{
-		return array_combine($keys, array_fill(count($keys), $value));
+		return (object)array_combine($keys, array_fill(count($keys), $value));
 	}
 }
 
+/*
+	This function aims to generate cryptographically strong random identifier.
+	Result identifier has length 4[strength/8/3] 
+*/
+function random_id($strength = 128)
+{
+	$n = ceil($strength/8);
+
+	if (function_exists('openssl_random_pseudo_bytes'))
+		$bin = openssl_random_pseudo_bytes($n, $cstrong); 	// openssl on php 5.3 and up
+	else if (file_exists('/dev/urandom'))
+		$bin = file_get_contents('/dev/urandom', false, null, -1, $n);  // linux std random device
+	else {
+		$bin = '';
+		for($i=0; $i < $n; $i++)
+			$bin .= chr(mt_rand(0, 255));	// Mersene Twister generator
+	}
+	$id = strtr(base64_encode($bin), '+/=', '-_x');	// see RFC 4648 Section 5
+
+	return $id;
+}
