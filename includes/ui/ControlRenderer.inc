@@ -44,7 +44,7 @@ class ControlRenderer
 
 	private $form_nested;
 	
-	function ControlRenderer() {
+	function __construct() {
 		$this->form_nested = -1;
 	}
 	
