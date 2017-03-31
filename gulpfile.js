@@ -200,7 +200,7 @@ gulp.task('env-files', function() {
 
 gulp.task('env-db', function(cb) {
   execute(
-      'gunzip -c modules/tests/data/fa_test.sql.gz | mysql -u travis -D fa_test',
+      'gunzip -c modules/tests/data/fa_test.sql.gz | mysql -u travis --password=\'\' -D fa_test',
       null,
       cb
     );
