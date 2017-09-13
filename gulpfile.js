@@ -145,7 +145,7 @@ gulp.task('db-backup', function(cb) {
 
 gulp.task('db-restore', function(cb) {
   var options = {
-    dryRun: true,
+    dryRun: false,
     silent : false,
     dest : "root@bms.saygoweb.com",
     key : "~/.ssh/dev_rsa",
