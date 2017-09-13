@@ -179,7 +179,7 @@ function print_balance_sheet()
 	else
 		$dec = user_price_dec();
 
-	$cols = array(0, 50, 200, 350, 425,	500);
+	$cols = array(0, 60, 200, 350, 425,	500);
 	//------------0--1---2----3----4----5--
 
 	$headers = array(_('Account'), _('Account Name'), _('Open Balance'), _('Period'),
@@ -312,7 +312,7 @@ function print_balance_sheet()
 		$pg->skin      = $SysPrefs->graph_skin;
 		$pg->built_in  = false;
 		$pg->latin_notation = ($SysPrefs->decseps[user_dec_sep()] != ".");
-		$filename = company_path(). "/pdf_files/". uniqid("").".png";
+		$filename = company_path(). "/pdf_files/". random_id().".png";
 		$pg->display($filename, true);
 		$w = $pg->width / 1.5;
 		$h = $pg->height / 1.5;

@@ -34,7 +34,7 @@ function get_open_balance($supplier_id, $to)
     $sql = "SELECT
     	SUM(IF(type IN(".ST_SUPPINVOICE.",".ST_BANKDEPOSIT."), (ov_amount + ov_gst + ov_discount), 0)) AS charges,
     	SUM(IF(type NOT IN(".ST_SUPPINVOICE.",".ST_BANKDEPOSIT."), (ov_amount + ov_gst + ov_discount), 0)) AS credits,
-		SUM(alloc) AS Allocated,
+		SUM(IF(type NOT IN(".ST_SUPPINVOICE.",".ST_BANKDEPOSIT."),alloc * -1, alloc)) AS Allocated,
 		SUM(IF(type IN(".ST_SUPPINVOICE.",".ST_BANKDEPOSIT."), (ov_amount + ov_gst + ov_discount - alloc),
 				(ov_amount + ov_gst + ov_discount + alloc))) AS OutStanding
 		FROM ".TB_PREF."supp_trans
@@ -102,7 +102,7 @@ function print_supplier_balances()
 	if ($no_zeros) $nozeros = _('Yes');
 	else $nozeros = _('No');
 
-	$cols = array(0, 100, 130, 190,	250, 320, 385, 450,	515);
+	$cols = array(0, 95, 140, 200,	250, 320, 385, 450,	515);
 
 	$headers = array(_('Trans Type'), _('#'), _('Date'), _('Due Date'), _('Charges'),
 		_('Credits'), _('Allocated'), _('Outstanding'));
@@ -191,19 +191,20 @@ function print_supplier_balances()
 				$item[0] = round2(abs($trans['TotalAmount']) * $rate, $dec);
 				$rep->AmountCol(4, 5, $item[0], $dec);
 				$accumulate += $item[0];
+				$item[2] = round2($trans['Allocated'] * $rate, $dec);
 			}
 			else
 			{
 				$item[1] = round2(abs($trans['TotalAmount']) * $rate, $dec);
 				$rep->AmountCol(5, 6, $item[1], $dec);
 				$accumulate -= $item[1];
+				$item[2] = round2($trans['Allocated'] * $rate, $dec) * -1;
 			}
-			$item[2] = round2($trans['Allocated'] * $rate, $dec);
 			$rep->AmountCol(6, 7, $item[2], $dec);
 			if ($trans['TotalAmount'] > 0.0)
 				$item[3] = $item[0] - $item[2];
 			else	
-				$item[3] = ($item[1] - $item[2]) * -1;
+				$item[3] = -$item[1] - $item[2];
 			if ($show_balance)	
 				$rep->AmountCol(7, 8, $accumulate, $dec);
 			else	

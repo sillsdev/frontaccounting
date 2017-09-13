@@ -17,15 +17,19 @@ include_once 'class.data_set.inc';
 **/
 
 class reflines_db extends data_set {
-	function reflines_db()
+	function __construct()
 	{
 		$this->set_validator('prefix:ui:_check_prefix', _("This prefix conflicts with another one already defined. Prefix have to be unambigous."));
 		$this->set_validator('prefix:ui:_check_template', _("Invalid template format."));
 		$this->set_validator('trans_type:ui:required', _("Transaction type cannot be empty."));
 		$this->set_validator('pattern:ui:required', _("Next reference cannot be empty."));
-		$this->data_set('reflines', 
-			array('trans_type', 'prefix', 'description', 'default', 'pattern', 'id', 'inactive'), 
-			'id');
+		parent::__construct(
+			'reflines',
+			array(
+				'trans_type', 'prefix', 'description', 'default', 'pattern', 'id', 'inactive'
+			),
+			'id'
+		);
 	}
 
 	/*
@@ -79,12 +83,12 @@ class reflines_db extends data_set {
 	{
 
 		$sql = "SELECT *
-			FROM (SELECT r.* FROM 0_refs r 
+			FROM (SELECT r.* FROM ".TB_PREF."refs r 
 				LEFT JOIN ".TB_PREF."voided as v
 					ON r.id=v.id AND r.type=v.type
 				WHERE r.type=".db_escape($trans_type)." AND ISNULL(v.id)
 				) ref
-			LEFT JOIN 0_reflines line ON ref.type=line.trans_type AND substr(ref.reference,1, LENGTH(line.prefix))= line.prefix AND line.prefix<>''
+			LEFT JOIN ".TB_PREF."reflines line ON ref.type=line.trans_type AND substr(ref.reference,1, LENGTH(line.prefix))= line.prefix AND line.prefix<>''
 			WHERE ".($prefix == '' ? "ISNULL(prefix)" : "prefix=".db_escape($prefix));
 
 		$res = db_query($sql, "cannot check reference line");

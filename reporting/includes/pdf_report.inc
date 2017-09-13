@@ -949,7 +949,7 @@ class FrontReport extends Cpdf
 		}
 		else
 		{
-			$dir =  company_path(). '/pdf_files';
+			$dir = company_path(). '/pdf_files';
 			//save the file
 			if (!file_exists($dir))
 			{
@@ -957,7 +957,7 @@ class FrontReport extends Cpdf
 			}
 			// do not use standard filenames or your sensitive company data 
 			// are world readable
-			$fname = $dir.'/'.uniqid('').'.pdf';
+			$fname = $dir.'/'.random_id().'.pdf';
 			$this->Output($fname, 'F');
 
 			if ($email == 1)
@@ -1035,11 +1035,11 @@ class FrontReport extends Cpdf
 				if ($printer == false) {
 					if (in_ajax()) {
 						global $Ajax;
-
-						if (user_rep_popup()) 
-							$Ajax->popup($fname); // when embeded pdf viewer used
+						$url = str_replace($path_to_root, '', $fname);
+						if (user_rep_popup())
+							$Ajax->popup($url); // when embeded pdf viewer used
 						else
-							$Ajax->redirect($fname); // otherwise use faster method
+							$Ajax->redirect($url); // otherwise use faster method
 					} else {
 						header('Content-type: application/pdf');
 						header('Content-Disposition: inline; filename='.$this->filename);

@@ -38,7 +38,7 @@ function getTransactions($category, $from, $to)
 			item.stock_id,
 			item.description,
 			line.unit_price * trans.rate AS unit_price,
-			SUM(line.quantity) as quantity
+			SUM(IF(line.debtor_trans_type = ".ST_CUSTCREDIT.", -line.quantity, line.quantity)) AS quantity
 		FROM ".TB_PREF."stock_master item,
 			".TB_PREF."stock_category category,
 			".TB_PREF."debtor_trans trans,
@@ -51,7 +51,7 @@ function getTransactions($category, $from, $to)
 		AND trans.tran_date<='$to'
 		AND line.quantity<>0
 		AND item.mb_flag <>'F'
-		AND line.debtor_trans_type = ".ST_SALESINVOICE;
+		AND (line.debtor_trans_type = ".ST_SALESINVOICE." OR line.debtor_trans_type = ".ST_CUSTCREDIT.")";
 		if ($category != 0)
 			$sql .= " AND item.category_id = ".db_escape($category);
 		$sql .= " GROUP BY item.category_id,
