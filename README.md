@@ -1,7 +1,7 @@
 FrontAccounting ERP
 ===================
 
-[![Build Status](https://travis-ci.org/cambell-prince/frontaccounting.svg?branch=unstable-cp)](https://travis-ci.org/cambell-prince/frontaccounting)
+[![Build Status](https://travis-ci.org/cambell-prince/frontaccounting.svg?branch=master-cp)](https://travis-ci.org/cambell-prince/frontaccounting)
 
 It supports double entry accounting providing both low level journal entry and user friendly, document based 
 interface for everyday business activity with automatic GL postings generation. This is multicurrency,
