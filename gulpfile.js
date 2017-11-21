@@ -218,7 +218,7 @@ gulp.task('env-test', ['env-db', 'env-files'], function() {});
 
 gulp.task('test-e2e-travis', ['env-test'], function(cb) {
   execute(
-    './node_modules/protractor/bin/protractor modules/tests/e2e/phantom-conf.js',
+    './node_modules/protractor/bin/protractor modules/tests/e2e/chrome-headless-conf.js',
     null,
     cb
   );
@@ -227,6 +227,14 @@ gulp.task('test-e2e-travis', ['env-test'], function(cb) {
 gulp.task('test-chrome', ['env-test'], function(cb) {
   execute(
     '/usr/local/bin/protractor modules/tests/e2e/chrome-conf.js',
+    null,
+    cb
+  );
+});
+
+gulp.task('test-chrome-headless', ['env-test'], function(cb) {
+  execute(
+    '/usr/local/bin/protractor modules/tests/e2e/chrome-headless-conf.js',
     null,
     cb
   );
