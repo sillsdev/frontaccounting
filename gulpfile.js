@@ -206,9 +206,17 @@ gulp.task('env-db', function(cb) {
     );
 });
 
+gulp.task('env-db-bootstrap', ['env-db'], function(cb) {
+  execute(
+    'mysql -u travis --password=\'\' -D fa_test -e "UPDATE 0_users SET theme=\'bootstrap\' WHERE user_id=\'test\'"',
+    null,
+    cb
+  )
+});
+
 gulp.task('env-db-demo', function(cb) {
   execute(
-      'gunzip -c modules/tests/data/fa_demo.sql.gz | mysql -u travis -D fa_test',
+      'gunzip -c modules/tests/data/fa_demo.sql.gz | mysql -u travis  --password=\'\' -D fa_test',
       null,
       cb
     );
@@ -225,6 +233,11 @@ gulp.task('test-e2e-travis', ['env-test'], function(cb) {
 });
 
 gulp.task('test-chrome', ['env-test'], function(cb) {
+  execute(
+    'mysql -u travis --password=\'\' -D fa_test -e "UPDATE 0_users SET theme=\'bootstrap\' WHERE user_id=\'test\'"',
+    null,
+    cb
+  )
   execute(
     '/usr/local/bin/protractor modules/tests/e2e/chrome-conf.js',
     null,
