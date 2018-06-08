@@ -100,10 +100,10 @@ gulp.task('upload', function(cb) {
     dryRun: false,
     silent : false,
     src : ".",
-    dest : "root@bms.keyman.com:/var/www/virtual/bms.keyman.com/htdocs/"
+    dest : "root@bms.lsdo.org:/var/www/virtual/lsdo.org/bms/htdocs/"
   };
   execute(
-    'rsync -rzlt --chmod=Dug=rwx,Fug=rw,o-rwx --delete --exclude-from="upload-exclude.txt" --stats --rsync-path="sudo -u vu2010 rsync" --rsh="ssh" <%= src %>/ <%= dest %>',
+    'rsync -rzlt --chmod=Dug=rwx,Fug=rw,o-rwx --delete --exclude-from="upload-exclude.txt" --stats --rsync-path="sudo -u vu2047 rsync" --rsh="ssh" <%= src %>/ <%= dest %>',
     options,
     cb
   );
